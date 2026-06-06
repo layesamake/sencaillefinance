@@ -1,10 +1,29 @@
-export default function NewOperationPage() {
+import { getActiveCategories } from "@/lib/queries/categories";
+import { getActiveAccounts } from "@/lib/queries/accounts";
+import { getActiveParties } from "@/lib/queries/parties";
+import OperationForm from "@/components/operations/OperationForm";
+
+export default async function NewOperationPage() {
+  const [categories, accounts, parties] = await Promise.all([
+    getActiveCategories(),
+    getActiveAccounts(),
+    getActiveParties()
+  ]);
+
   return (
-    <div className="p-4 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-100">Saisir une opération</h1>
-      <div className="rounded-xl bg-gray-900 p-5 border border-gray-800">
-        <p className="text-gray-400">Formulaire de saisie à venir.</p>
+    <div className="p-4 max-w-2xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-100">Nouvelle opération</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Enregistrez une recette ou une dépense
+        </p>
       </div>
+
+      <OperationForm 
+        categories={categories}
+        accounts={accounts}
+        parties={parties}
+      />
     </div>
   );
 }

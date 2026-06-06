@@ -87,3 +87,10 @@ export interface Payment {
   deleted_by?: string | null;
   deleted_at?: string | null;
 }
+
+export interface OperationWithDetails extends Operation {
+  categories?: { name: string };
+  parties?: { name: string; phone?: string | null };
+  accounts?: { name: string };
+  profiles?: { full_name: string };
+}

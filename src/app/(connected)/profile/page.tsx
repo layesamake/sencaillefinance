@@ -24,13 +24,13 @@ export default async function ProfilePage() {
   return (
     <div className="p-4 max-w-xl mx-auto space-y-6 pb-24">
       <div>
-        <h1 className="text-2xl font-bold text-gray-100">Mon profil</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-primary-text">Mon profil</h1>
+        <p className="text-sm text-muted mt-1">
           Gérez vos informations personnelles et votre sécurité
         </p>
       </div>
       
-      <div className="rounded-3xl bg-gray-900 p-6 border border-gray-800 shadow-xl">
+      <div className="rounded-3xl bg-surface p-6 border border-border shadow-xl">
         <ProfileForm profile={profile as Profile} user={user} />
       </div>
     </div>

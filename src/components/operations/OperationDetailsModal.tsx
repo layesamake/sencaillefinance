@@ -15,7 +15,7 @@ export default function OperationDetailsModal({ operation, accounts, onClose }: 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isPending, startTransition] = useTransition();
   const isIncome = operation.operation_type === "income";
-  const amountColor = isIncome ? "text-emerald-400" : "text-red-400";
+  const amountColor = isIncome ? "text-success" : "text-danger";
   
   const activePayments = operation.payments?.filter(p => p.status === 'active') || [];
   const sumPayments = activePayments.reduce((sum, p) => sum + p.amount, 0);
@@ -29,13 +29,13 @@ export default function OperationDetailsModal({ operation, accounts, onClose }: 
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-md bg-surface border border-border rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-800">
-          <h2 className="text-lg font-bold text-gray-100">Détails de l'opération</h2>
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <h2 className="text-lg font-bold text-primary-text">Détails de l'opération</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-gray-200 transition-colors"
+            className="p-2 rounded-full hover:bg-surface-hover text-muted hover:text-primary-text transition-colors"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -46,18 +46,18 @@ export default function OperationDetailsModal({ operation, accounts, onClose }: 
         {/* Content */}
         <div className="p-6 overflow-y-auto space-y-6">
           <div className="text-center">
-            <span className="text-sm text-gray-400 font-medium uppercase tracking-wider">
+            <span className="text-sm text-muted font-medium uppercase tracking-wider">
               {isIncome ? "Recette" : "Dépense"}
             </span>
             <p className={`text-4xl font-black mt-2 ${amountColor}`}>
               {isIncome ? "+" : "-"}{operation.total_amount.toLocaleString("fr-FR")} F
             </p>
-            <p className="text-gray-300 font-medium text-lg mt-1">
+            <p className="text-primary-text font-medium text-lg mt-1">
               {operation.categories?.name}
             </p>
           </div>
 
-          <div className="space-y-4 pt-4 border-t border-gray-800">
+          <div className="space-y-4 pt-4 border-t border-border">
             <DetailRow label="Date" value={format(new Date(operation.operation_date), "dd MMMM yyyy", { locale: fr })} />
             <DetailRow label="Règlement" value={statusLabels[operation.settlement_mode]} />
             
@@ -70,10 +70,10 @@ export default function OperationDetailsModal({ operation, accounts, onClose }: 
 
             {restant > 0 && (
               <div className="pt-2">
-                <DetailRow label="Reste à payer" value={`${restant.toLocaleString("fr-FR")} F`} valueColor="text-amber-400" />
+                <DetailRow label="Reste à payer" value={`${restant.toLocaleString("fr-FR")} F`} valueColor="text-warning" />
                 <button
                   onClick={() => setShowPaymentModal(true)}
-                  className="mt-3 w-full py-2.5 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 rounded-xl text-sm font-semibold transition-colors"
+                  className="mt-3 w-full py-2.5 bg-warning/10 text-warning hover:bg-warning/20 rounded-xl text-sm font-semibold transition-colors"
                 >
                   Saisir un paiement
                 </button>
@@ -81,13 +81,13 @@ export default function OperationDetailsModal({ operation, accounts, onClose }: 
             )}
 
             {activePayments.length > 0 && (
-              <div className="pt-4 border-t border-gray-800 space-y-3">
-                <h3 className="text-sm font-bold text-gray-300">Historique des paiements</h3>
+              <div className="pt-4 border-t border-border space-y-3">
+                <h3 className="text-sm font-bold text-primary-text">Historique des paiements</h3>
                 {activePayments.map(p => (
-                  <div key={p.id} className="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl border border-gray-700/50 group">
+                  <div key={p.id} className="flex justify-between items-center bg-surface-hover/50 p-3 rounded-xl border border-border/50 group">
                     <div>
-                      <p className="text-sm font-semibold text-gray-200">{p.amount.toLocaleString("fr-FR")} F</p>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-sm font-semibold text-primary-text">{p.amount.toLocaleString("fr-FR")} F</p>
+                      <p className="text-xs text-muted mt-0.5">
                         {format(new Date(p.payment_date), "dd MMM yyyy", { locale: fr })} • {p.accounts?.name || "Compte inconnu"}
                       </p>
                     </div>
@@ -101,7 +101,7 @@ export default function OperationDetailsModal({ operation, accounts, onClose }: 
                           });
                         }
                       }}
-                      className="p-2 text-gray-500 hover:text-red-400 bg-gray-900/50 rounded-xl opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50 sm:block hidden"
+                      className="p-2 text-muted hover:text-danger bg-surface/50 rounded-xl opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50 sm:block hidden"
                       title="Supprimer ce paiement"
                     >
                       🗑️
@@ -116,7 +116,7 @@ export default function OperationDetailsModal({ operation, accounts, onClose }: 
                           });
                         }
                       }}
-                      className="p-2 text-gray-500 hover:text-red-400 bg-gray-900/50 rounded-xl transition-all disabled:opacity-50 block sm:hidden"
+                      className="p-2 text-muted hover:text-danger bg-surface/50 rounded-xl transition-all disabled:opacity-50 block sm:hidden"
                       title="Supprimer ce paiement"
                     >
                       🗑️
@@ -132,16 +132,16 @@ export default function OperationDetailsModal({ operation, accounts, onClose }: 
 
             {operation.description && (
               <div className="pt-2">
-                <span className="block text-sm text-gray-500 mb-1">Description</span>
-                <p className="text-sm text-gray-300 bg-gray-800/50 p-3 rounded-xl">
+                <span className="block text-sm text-muted mb-1">Description</span>
+                <p className="text-sm text-primary-text bg-surface-hover/50 p-3 rounded-xl">
                   {operation.description}
                 </p>
               </div>
             )}
           </div>
 
-          <div className="space-y-2 pt-4 border-t border-gray-800 text-xs text-gray-500">
-            <p>Saisie par : <span className="text-gray-400">{operation.profiles?.full_name || "Inconnu"}</span></p>
+          <div className="space-y-2 pt-4 border-t border-border text-xs text-muted">
+            <p>Saisie par : <span className="text-muted">{operation.profiles?.full_name || "Inconnu"}</span></p>
             <p>Créée le : {format(new Date(operation.created_at), "dd/MM/yyyy à HH:mm", { locale: fr })}</p>
             {operation.updated_at !== operation.created_at && (
               <p>Modifiée le : {format(new Date(operation.updated_at), "dd/MM/yyyy à HH:mm", { locale: fr })}</p>
@@ -166,10 +166,10 @@ export default function OperationDetailsModal({ operation, accounts, onClose }: 
   );
 }
 
-function DetailRow({ label, value, valueColor = "text-gray-200" }: { label: string; value: string; valueColor?: string }) {
+function DetailRow({ label, value, valueColor = "text-primary-text" }: { label: string; value: string; valueColor?: string }) {
   return (
     <div className="flex justify-between items-center text-sm">
-      <span className="text-gray-500">{label}</span>
+      <span className="text-muted">{label}</span>
       <span className={`font-medium ${valueColor}`}>{value}</span>
     </div>
   );

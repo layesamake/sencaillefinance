@@ -13,8 +13,8 @@ export default async function NewOperationPage() {
   return (
     <div className="p-4 max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-100">Nouvelle opération</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-primary-text">Nouvelle opération</h1>
+        <p className="text-sm text-muted mt-1">
           Enregistrez une recette ou une dépense
         </p>
       </div>

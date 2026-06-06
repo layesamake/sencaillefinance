@@ -35,13 +35,13 @@ export default async function ConnectedLayout({
     if (insertError) {
       console.error("[layout] Erreur création profil:", insertError);
       return (
-        <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-950">
+        <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
           <div className="w-full max-w-sm rounded-xl bg-red-950/50 p-6 text-center border border-red-900/50">
-            <h1 className="text-lg font-bold mb-2 text-red-400">Erreur de Profil</h1>
+            <h1 className="text-lg font-bold mb-2 text-danger">Erreur de Profil</h1>
             <p className="mb-4 text-sm text-red-300">
               Impossible de créer votre profil automatiquement.
             </p>
-            <p className="text-xs text-red-400/70 font-mono break-all">
+            <p className="text-xs text-danger/70 font-mono break-all">
               {insertError.message}
             </p>
           </div>
@@ -58,9 +58,9 @@ export default async function ConnectedLayout({
 
     if (!newProfile) {
       return (
-        <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-950">
+        <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
           <div className="w-full max-w-sm rounded-xl bg-red-950/50 p-6 text-center border border-red-900/50">
-            <h1 className="text-lg font-bold mb-2 text-red-400">Erreur de Profil</h1>
+            <h1 className="text-lg font-bold mb-2 text-danger">Erreur de Profil</h1>
             <p className="text-sm text-red-300">
               Le profil a été créé mais ne peut pas être relu. Rafraîchissez la page.
             </p>
@@ -73,7 +73,7 @@ export default async function ConnectedLayout({
     return (
       <>
         <TopBar role={newProfile.role} fullName={newProfile.full_name} />
-        <main className="flex-1 pt-16 pb-16 min-h-screen bg-gray-950 text-gray-100">
+        <main className="flex-1 pt-16 pb-16 min-h-screen bg-background text-primary-text">
           {children}
         </main>
         <BottomNav />
@@ -83,14 +83,14 @@ export default async function ConnectedLayout({
 
   if (profile.status === "disabled") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-950">
+      <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
         <div className="w-full max-w-sm rounded-xl bg-red-950/50 p-6 text-center border border-red-900/50">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-900/30 mb-4">
-            <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+            <svg className="h-6 w-6 text-danger" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
             </svg>
           </div>
-          <h1 className="text-lg font-bold mb-2 text-red-400">Accès bloqué</h1>
+          <h1 className="text-lg font-bold mb-2 text-danger">Accès bloqué</h1>
           <p className="mb-6 text-sm text-red-300">Votre compte a été désactivé. Veuillez contacter l'administrateur.</p>
         </div>
       </div>
@@ -100,7 +100,7 @@ export default async function ConnectedLayout({
   return (
     <>
       <TopBar role={profile.role} fullName={profile.full_name} />
-      <main className="flex-1 pt-16 pb-16 min-h-screen bg-gray-950 text-gray-100">
+      <main className="flex-1 pt-16 pb-16 min-h-screen bg-background text-primary-text transition-colors duration-300">
         {children}
       </main>
       <BottomNav />

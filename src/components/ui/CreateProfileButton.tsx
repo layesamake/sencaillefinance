@@ -31,14 +31,14 @@ export default function CreateProfileButton() {
   return (
     <div className="w-full">
       {error && (
-        <div className="mb-4 rounded-lg bg-red-950/80 p-3 text-sm text-red-400 border border-red-900">
+        <div className="mb-4 rounded-lg bg-red-950/80 p-3 text-sm text-danger border border-red-900">
           {error}
         </div>
       )}
       <button
         onClick={handleClick}
         disabled={loading}
-        className="w-full rounded-lg bg-red-600 py-2.5 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-950 disabled:opacity-50 transition-colors"
+        className="w-full rounded-lg bg-red-600 py-2.5 text-sm font-medium text-primary-text hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-950 disabled:opacity-50 transition-colors"
       >
         {loading ? "Création en cours..." : "Créer mon profil administrateur"}
       </button>

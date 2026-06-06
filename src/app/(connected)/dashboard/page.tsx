@@ -14,8 +14,8 @@ export default async function DashboardPage() {
     <div className="p-4 max-w-2xl mx-auto space-y-6 pb-24">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-100">Tableau de bord</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-primary-text">Tableau de bord</h1>
+        <p className="text-sm text-muted mt-1">
           Aperçu de votre situation financière
         </p>
       </div>
@@ -28,56 +28,56 @@ export default async function DashboardPage() {
         <p className="text-sm font-medium text-blue-200/80 uppercase tracking-wider mb-2">
           Solde Total en Caisse
         </p>
-        <p className="text-4xl font-black text-white relative z-10">
-          {stats.totalBalance.toLocaleString("fr-FR")} <span className="text-2xl text-blue-300">F</span>
+        <p className="text-4xl font-black text-primary-text relative z-10">
+          {stats.totalBalance.toLocaleString("fr-FR")} <span className="text-2xl text-accent">F</span>
         </p>
       </div>
 
       {/* Debts and Receivables */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-5">
-          <div className="flex items-center space-x-2 text-emerald-400 mb-2">
+        <div className="bg-surface border border-border rounded-3xl p-5">
+          <div className="flex items-center space-x-2 text-success mb-2">
             <ArrowDownRight size={20} />
             <p className="text-xs font-bold uppercase tracking-wider">Créances</p>
           </div>
-          <p className="text-xl font-bold text-gray-100">{stats.totalReceivables.toLocaleString("fr-FR")} F</p>
-          <p className="text-xs text-gray-500 mt-1">À recouvrer</p>
+          <p className="text-xl font-bold text-primary-text">{stats.totalReceivables.toLocaleString("fr-FR")} F</p>
+          <p className="text-xs text-muted mt-1">À recouvrer</p>
         </div>
-        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-5">
-          <div className="flex items-center space-x-2 text-red-400 mb-2">
+        <div className="bg-surface border border-border rounded-3xl p-5">
+          <div className="flex items-center space-x-2 text-danger mb-2">
             <ArrowUpRight size={20} />
             <p className="text-xs font-bold uppercase tracking-wider">Dettes</p>
           </div>
-          <p className="text-xl font-bold text-gray-100">{stats.totalDebts.toLocaleString("fr-FR")} F</p>
-          <p className="text-xs text-gray-500 mt-1">À payer</p>
+          <p className="text-xl font-bold text-primary-text">{stats.totalDebts.toLocaleString("fr-FR")} F</p>
+          <p className="text-xs text-muted mt-1">À payer</p>
         </div>
       </div>
 
       {/* Monthly Performance */}
-      <div className="bg-gray-900 border border-gray-800 rounded-3xl p-5 space-y-4">
+      <div className="bg-surface border border-border rounded-3xl p-5 space-y-4">
         <div className="flex items-center space-x-2 mb-2">
-          <Activity size={20} className="text-blue-400" />
-          <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Performance du mois</h2>
+          <Activity size={20} className="text-accent" />
+          <h2 className="text-sm font-bold text-primary-text uppercase tracking-wider">Performance du mois</h2>
         </div>
         
         <div className="space-y-3">
           <div>
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-400">Entrées</span>
-              <span className="font-bold text-emerald-400">+{stats.thisMonthIncome.toLocaleString("fr-FR")} F</span>
+              <span className="text-muted">Entrées</span>
+              <span className="font-bold text-success">+{stats.thisMonthIncome.toLocaleString("fr-FR")} F</span>
             </div>
-            <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-              <div className="bg-emerald-500 h-full rounded-full" style={{ width: '100%' }}></div>
+            <div className="w-full bg-background rounded-full h-2 overflow-hidden border border-border">
+              <div className="bg-success h-full rounded-full" style={{ width: '100%' }}></div>
             </div>
           </div>
           
           <div>
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-400">Sorties</span>
-              <span className="font-bold text-red-400">-{stats.thisMonthExpense.toLocaleString("fr-FR")} F</span>
+              <span className="text-muted">Sorties</span>
+              <span className="font-bold text-danger">-{stats.thisMonthExpense.toLocaleString("fr-FR")} F</span>
             </div>
-            <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
-              <div className="bg-red-500 h-full rounded-full" style={{ width: stats.thisMonthIncome > 0 ? `${Math.min((stats.thisMonthExpense / stats.thisMonthIncome) * 100, 100)}%` : '0%' }}></div>
+            <div className="w-full bg-background rounded-full h-2 overflow-hidden border border-border">
+              <div className="bg-danger h-full rounded-full" style={{ width: stats.thisMonthIncome > 0 ? `${Math.min((stats.thisMonthExpense / stats.thisMonthIncome) * 100, 100)}%` : '0%' }}></div>
             </div>
           </div>
         </div>
@@ -86,8 +86,8 @@ export default async function DashboardPage() {
       {/* Recent Operations */}
       <div className="pt-2 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-gray-100">Dernières opérations</h2>
-          <Link href="/operations" className="text-sm font-medium text-blue-400 hover:text-blue-300">
+          <h2 className="text-lg font-bold text-primary-text">Dernières opérations</h2>
+          <Link href="/operations" className="text-sm font-medium text-accent hover:text-accent-hover transition-colors">
             Voir tout
           </Link>
         </div>
@@ -95,8 +95,8 @@ export default async function DashboardPage() {
         {stats.recentOperations.length > 0 ? (
           <OperationsList operations={stats.recentOperations} accounts={accounts} />
         ) : (
-          <div className="text-center py-10 bg-gray-900 border border-gray-800 rounded-3xl">
-            <p className="text-gray-500">Aucune opération récente.</p>
+          <div className="text-center py-10 bg-surface border border-border rounded-3xl">
+            <p className="text-muted">Aucune opération récente.</p>
           </div>
         )}
       </div>

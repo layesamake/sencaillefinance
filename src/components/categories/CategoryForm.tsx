@@ -61,15 +61,15 @@ export default function CategoryForm({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
       <div
-        className="w-full max-w-md rounded-t-2xl sm:rounded-2xl bg-gray-900 border border-gray-800 p-6 shadow-2xl animate-in slide-in-from-bottom duration-300"
+        className="w-full max-w-md rounded-t-2xl sm:rounded-2xl bg-surface border border-border p-6 shadow-2xl animate-in slide-in-from-bottom duration-300"
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-gray-100">
+          <h2 className="text-lg font-bold text-primary-text">
             {isEdit ? "Modifier la catégorie" : "Nouvelle catégorie"}
           </h2>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-colors"
+            className="rounded-lg p-1.5 text-muted hover:bg-surface-hover hover:text-primary-text transition-colors"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -80,7 +80,7 @@ export default function CategoryForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Nom */}
           <div>
-            <label htmlFor="category-name" className="block text-sm font-medium text-gray-300 mb-1.5">
+            <label htmlFor="category-name" className="block text-sm font-medium text-primary-text mb-1.5">
               Nom de la catégorie
             </label>
             <input
@@ -90,14 +90,14 @@ export default function CategoryForm({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ex: Vente œufs de caille"
-              className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 placeholder:text-gray-600 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
+              className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text placeholder:text-gray-600 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
             />
           </div>
 
           {/* Type (seulement en création) */}
           {!isEdit && (
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label className="block text-sm font-medium text-primary-text mb-1.5">
                 Type d'opération
               </label>
               <div className="flex gap-2">
@@ -106,8 +106,8 @@ export default function CategoryForm({
                   onClick={() => setType("income")}
                   className={`flex-1 rounded-xl py-2.5 text-sm font-medium border transition-all ${
                     type === "income"
-                      ? "bg-emerald-600/20 border-emerald-600 text-emerald-400"
-                      : "bg-gray-800 border-gray-700 text-gray-500 hover:border-gray-600"
+                      ? "bg-emerald-600/20 border-emerald-600 text-success"
+                      : "bg-surface-hover border-border text-muted hover:border-gray-600"
                   }`}
                 >
                   Recette
@@ -117,8 +117,8 @@ export default function CategoryForm({
                   onClick={() => setType("expense")}
                   className={`flex-1 rounded-xl py-2.5 text-sm font-medium border transition-all ${
                     type === "expense"
-                      ? "bg-red-600/20 border-red-600 text-red-400"
-                      : "bg-gray-800 border-gray-700 text-gray-500 hover:border-gray-600"
+                      ? "bg-red-600/20 border-red-600 text-danger"
+                      : "bg-surface-hover border-border text-muted hover:border-gray-600"
                   }`}
                 >
                   Dépense
@@ -129,7 +129,7 @@ export default function CategoryForm({
 
           {/* Erreur */}
           {error && (
-            <div className="rounded-xl bg-red-950/50 border border-red-900/50 p-3 text-sm text-red-400">
+            <div className="rounded-xl bg-red-950/50 border border-red-900/50 p-3 text-sm text-danger">
               {error}
             </div>
           )}
@@ -139,14 +139,14 @@ export default function CategoryForm({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl bg-gray-800 border border-gray-700 py-3 text-sm font-medium text-gray-400 hover:bg-gray-750 hover:text-gray-200 transition-colors"
+              className="flex-1 rounded-xl bg-surface-hover border border-border py-3 text-sm font-medium text-muted hover:bg-gray-750 hover:text-primary-text transition-colors"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={isPending || !name.trim()}
-              className={`flex-1 rounded-xl py-3 text-sm font-medium text-white transition-all disabled:opacity-50 ${
+              className={`flex-1 rounded-xl py-3 text-sm font-medium text-primary-text transition-all disabled:opacity-50 ${
                 type === "income"
                   ? "bg-emerald-600 hover:bg-emerald-700"
                   : "bg-red-600 hover:bg-red-700"

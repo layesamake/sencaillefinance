@@ -18,13 +18,13 @@ export default function CreditsView({ receivables, debts, accounts }: CreditsVie
   return (
     <div className="space-y-6">
       {/* Tabs */}
-      <div className="flex bg-gray-900 rounded-2xl p-1 border border-gray-800 relative z-10">
+      <div className="flex bg-surface rounded-2xl p-1 border border-border relative z-10">
         <button
           onClick={() => setActiveTab("receivables")}
           className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${
             activeTab === "receivables"
-              ? "bg-gray-800 text-emerald-400 shadow-md"
-              : "text-gray-500 hover:text-gray-300"
+              ? "bg-surface-hover text-success shadow-md"
+              : "text-muted hover:text-primary-text"
           }`}
         >
           Créances ({receivables.length})
@@ -33,8 +33,8 @@ export default function CreditsView({ receivables, debts, accounts }: CreditsVie
           onClick={() => setActiveTab("debts")}
           className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${
             activeTab === "debts"
-              ? "bg-gray-800 text-red-400 shadow-md"
-              : "text-gray-500 hover:text-gray-300"
+              ? "bg-surface-hover text-danger shadow-md"
+              : "text-muted hover:text-primary-text"
           }`}
         >
           Dettes ({debts.length})
@@ -46,8 +46,8 @@ export default function CreditsView({ receivables, debts, accounts }: CreditsVie
         {currentList.length > 0 ? (
           <OperationsList operations={currentList} accounts={accounts} />
         ) : (
-          <div className="text-center py-12 bg-gray-900 border border-gray-800 rounded-3xl">
-            <p className="text-gray-500">
+          <div className="text-center py-12 bg-surface border border-border rounded-3xl">
+            <p className="text-muted">
               {activeTab === "receivables" 
                 ? "Aucune créance en attente ! Tout le monde a payé." 
                 : "Aucune dette en attente ! Vous êtes à jour."}

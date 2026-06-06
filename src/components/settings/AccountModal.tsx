@@ -42,27 +42,27 @@ export default function AccountModal({ account, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-sm bg-gray-900 border border-gray-800 rounded-3xl shadow-2xl p-6">
+      <div className="w-full max-w-sm bg-surface border border-border rounded-3xl shadow-2xl p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-lg font-bold text-gray-100">
+          <h2 className="text-lg font-bold text-primary-text">
             {isEditing ? "Modifier le compte" : "Nouveau compte"}
           </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300">
+          <button onClick={onClose} className="text-muted hover:text-primary-text">
             ✕
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && <div className="p-3 bg-red-950/50 text-red-400 text-sm rounded-xl">{error}</div>}
+          {error && <div className="p-3 bg-red-950/50 text-danger text-sm rounded-xl">{error}</div>}
           
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Nom du compte</label>
-            <input required type="text" value={name} onChange={e => setName(e.target.value)} placeholder="ex: Wave Principal" className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:border-blue-500 focus:outline-none" />
+            <label className="block text-sm text-muted mb-1">Nom du compte</label>
+            <input required type="text" value={name} onChange={e => setName(e.target.value)} placeholder="ex: Wave Principal" className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:border-accent focus:outline-none" />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Type de compte</label>
-            <select value={accountType} onChange={e => setAccountType(e.target.value as AccountType)} className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:border-blue-500 focus:outline-none">
+            <label className="block text-sm text-muted mb-1">Type de compte</label>
+            <select value={accountType} onChange={e => setAccountType(e.target.value as AccountType)} className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:border-accent focus:outline-none">
               <option value="wave">Wave</option>
               <option value="cash">Espèces (Caisse)</option>
               <option value="bank">Banque</option>
@@ -71,12 +71,12 @@ export default function AccountModal({ account, onClose }: Props) {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Solde initial (F CFA)</label>
-            <input required type="number" step="1" value={openingBalance} onChange={e => setOpeningBalance(e.target.value)} className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:border-blue-500 focus:outline-none" />
-            <p className="text-xs text-gray-500 mt-1">L'argent disponible sur ce compte au moment de sa création.</p>
+            <label className="block text-sm text-muted mb-1">Solde initial (F CFA)</label>
+            <input required type="number" step="1" value={openingBalance} onChange={e => setOpeningBalance(e.target.value)} className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:border-accent focus:outline-none" />
+            <p className="text-xs text-muted mt-1">L'argent disponible sur ce compte au moment de sa création.</p>
           </div>
 
-          <button type="submit" disabled={isPending} className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl text-white font-bold transition-all disabled:opacity-50 mt-2">
+          <button type="submit" disabled={isPending} className="w-full py-3 bg-accent hover:bg-accent-hover rounded-xl text-primary-text font-bold transition-all disabled:opacity-50 mt-2">
             {isPending ? "Enregistrement..." : "Enregistrer"}
           </button>
         </form>

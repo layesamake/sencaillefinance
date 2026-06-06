@@ -32,18 +32,18 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-[80vh] flex-col items-center justify-center p-4">
-      <div className="w-full max-w-sm rounded-xl bg-gray-900 p-8 shadow-sm border border-gray-800">
-        <h1 className="mb-6 text-2xl font-bold text-center text-gray-100">Connexion</h1>
+      <div className="w-full max-w-sm rounded-xl bg-surface p-8 shadow-sm border border-border">
+        <h1 className="mb-6 text-2xl font-bold text-center text-primary-text">Connexion</h1>
         
         {error && (
-          <div className="mb-4 rounded-lg bg-red-950/50 p-3 text-sm text-red-400 border border-red-900/50">
+          <div className="mb-4 rounded-lg bg-red-950/50 p-3 text-sm text-danger border border-red-900/50">
             {error}
           </div>
         )}
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="email">
+            <label className="block text-sm font-medium text-primary-text mb-1" htmlFor="email">
               Email
             </label>
             <input
@@ -51,12 +51,12 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-gray-700 bg-gray-950 p-2.5 text-sm text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-background p-2.5 text-sm text-primary-text focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1" htmlFor="password">
+            <label className="block text-sm font-medium text-primary-text mb-1" htmlFor="password">
               Mot de passe
             </label>
             <input
@@ -64,14 +64,14 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-gray-700 bg-gray-950 p-2.5 text-sm text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-border bg-background p-2.5 text-sm text-primary-text focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               required
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+            className="w-full rounded-lg bg-accent py-2.5 text-sm font-medium text-primary-text hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:opacity-50 transition-colors"
           >
             {loading ? "Connexion en cours..." : "Se connecter"}
           </button>

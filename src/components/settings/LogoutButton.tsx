@@ -20,15 +20,15 @@ export default function LogoutButton() {
       className="w-full bg-red-950/20 border border-red-900/50 p-4 rounded-2xl flex items-center justify-between hover:bg-red-900/40 transition-all text-left mt-8"
     >
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-red-500/10 text-red-400 rounded-xl">
+        <div className="p-3 bg-danger/10 text-danger rounded-xl">
           <LogOut size={24} />
         </div>
         <div>
-          <h3 className="font-bold text-red-400">Déconnexion</h3>
-          <p className="text-sm text-red-500/70">Se déconnecter de l'application</p>
+          <h3 className="font-bold text-danger">Déconnexion</h3>
+          <p className="text-sm text-danger/70">Se déconnecter de l'application</p>
         </div>
       </div>
-      <ChevronRight className="text-red-500/50" />
+      <ChevronRight className="text-danger/50" />
     </button>
   );
 }

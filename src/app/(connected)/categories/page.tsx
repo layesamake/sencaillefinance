@@ -21,8 +21,8 @@ export default async function CategoriesPage() {
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-100">Catégories</h1>
-        <span className="text-sm text-gray-500">{categories.length} au total</span>
+        <h1 className="text-xl font-bold text-primary-text">Catégories</h1>
+        <span className="text-sm text-muted">{categories.length} au total</span>
       </div>
       <CategoriesList categories={categories} isAdmin={isAdmin} />
     </div>

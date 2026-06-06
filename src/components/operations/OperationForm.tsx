@@ -112,23 +112,23 @@ export default function OperationForm({ categories: initialCategories, accounts,
   return (
     <div className="space-y-6">
       {error && (
-        <div className="rounded-xl bg-red-950/50 border border-red-900/50 p-4 text-sm text-red-400">
+        <div className="rounded-xl bg-red-950/50 border border-red-900/50 p-4 text-sm text-danger">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Type d'opération */}
-        <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800 space-y-4">
-          <label className="block text-sm font-medium text-gray-300">Type d'opération</label>
+        <div className="bg-surface rounded-2xl p-5 border border-border space-y-4">
+          <label className="block text-sm font-medium text-primary-text">Type d'opération</label>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => handleTypeChange("income")}
               className={`flex-1 rounded-xl py-3.5 text-sm font-medium border transition-all ${
                 operationType === "income"
-                  ? "bg-emerald-600/20 border-emerald-600 text-emerald-400 shadow-[0_0_15px_rgba(5,150,105,0.1)]"
-                  : "bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600"
+                  ? "bg-emerald-600/20 border-emerald-600 text-success shadow-[0_0_15px_rgba(5,150,105,0.1)]"
+                  : "bg-surface-hover border-border text-muted hover:border-gray-600"
               }`}
             >
               Recette
@@ -138,8 +138,8 @@ export default function OperationForm({ categories: initialCategories, accounts,
               onClick={() => handleTypeChange("expense")}
               className={`flex-1 rounded-xl py-3.5 text-sm font-medium border transition-all ${
                 operationType === "expense"
-                  ? "bg-red-600/20 border-red-600 text-red-400 shadow-[0_0_15px_rgba(220,38,38,0.1)]"
-                  : "bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600"
+                  ? "bg-red-600/20 border-red-600 text-danger shadow-[0_0_15px_rgba(220,38,38,0.1)]"
+                  : "bg-surface-hover border-border text-muted hover:border-gray-600"
               }`}
             >
               Dépense
@@ -147,15 +147,15 @@ export default function OperationForm({ categories: initialCategories, accounts,
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800 space-y-5">
+        <div className="bg-surface rounded-2xl p-5 border border-border space-y-5">
           {/* Catégorie */}
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-300">Catégorie</label>
+            <label className="block text-sm font-medium text-primary-text">Catégorie</label>
             <div className="flex gap-2">
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="flex-1 rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none"
+                className="flex-1 rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent appearance-none"
               >
                 <option value="">Sélectionner une catégorie...</option>
                 {filteredCategories.map(cat => (
@@ -165,7 +165,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
               <button
                 type="button"
                 onClick={() => setShowCategoryModal(true)}
-                className="rounded-xl bg-gray-800 border border-gray-700 px-4 text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
+                className="rounded-xl bg-surface-hover border border-border px-4 text-muted hover:text-primary-text hover:border-gray-500 transition-colors"
                 title="Nouvelle catégorie"
               >
                 +
@@ -175,30 +175,30 @@ export default function OperationForm({ categories: initialCategories, accounts,
 
           {/* Montant Total */}
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-300">Montant total (FCFA)</label>
+            <label className="block text-sm font-medium text-primary-text">Montant total (FCFA)</label>
             <input
               type="number"
               min="1"
               value={totalAmount}
               onChange={handleTotalAmountChange}
               placeholder="Ex: 50000"
-              className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-lg font-semibold text-gray-100 placeholder:text-gray-600 placeholder:font-normal focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
+              className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-lg font-semibold text-primary-text placeholder:text-gray-600 placeholder:font-normal focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
             />
           </div>
         </div>
 
-        <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800 space-y-5">
+        <div className="bg-surface rounded-2xl p-5 border border-border space-y-5">
           {/* Mode de règlement */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-300">Règlement</label>
+            <label className="block text-sm font-medium text-primary-text">Règlement</label>
             <div className="flex flex-col sm:flex-row gap-2">
               <button
                 type="button"
                 onClick={() => handleModeChange("paid")}
                 className={`flex-1 rounded-xl py-2.5 text-sm font-medium border transition-all ${
                   settlementMode === "paid"
-                    ? "bg-blue-600/20 border-blue-600 text-blue-400"
-                    : "bg-gray-800 border-gray-700 text-gray-400"
+                    ? "bg-accent/20 border-blue-600 text-accent"
+                    : "bg-surface-hover border-border text-muted"
                 }`}
               >
                 Payé totalement
@@ -208,8 +208,8 @@ export default function OperationForm({ categories: initialCategories, accounts,
                 onClick={() => handleModeChange("partial")}
                 className={`flex-1 rounded-xl py-2.5 text-sm font-medium border transition-all ${
                   settlementMode === "partial"
-                    ? "bg-amber-600/20 border-amber-600 text-amber-400"
-                    : "bg-gray-800 border-gray-700 text-gray-400"
+                    ? "bg-amber-600/20 border-amber-600 text-warning"
+                    : "bg-surface-hover border-border text-muted"
                 }`}
               >
                 Paiement partiel
@@ -220,7 +220,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
                 className={`flex-1 rounded-xl py-2.5 text-sm font-medium border transition-all ${
                   settlementMode === "credit"
                     ? "bg-purple-600/20 border-purple-600 text-purple-400"
-                    : "bg-gray-800 border-gray-700 text-gray-400"
+                    : "bg-surface-hover border-border text-muted"
                 }`}
               >
                 À crédit
@@ -232,13 +232,13 @@ export default function OperationForm({ categories: initialCategories, accounts,
           {settlementMode !== "credit" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-300">
+                <label className="block text-sm font-medium text-primary-text">
                   {settlementMode === "paid" ? "Moyen de paiement" : "Moyen (Avance)"}
                 </label>
                 <select
                   value={initialAccountId}
                   onChange={(e) => setInitialAccountId(e.target.value)}
-                  className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:border-blue-500 appearance-none"
+                  className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:border-accent appearance-none"
                 >
                   <option value="">Choisir un compte...</option>
                   {accounts.map(acc => (
@@ -249,7 +249,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
 
               {settlementMode === "partial" && (
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-gray-300">Montant payé (FCFA)</label>
+                  <label className="block text-sm font-medium text-primary-text">Montant payé (FCFA)</label>
                   <input
                     type="number"
                     min="1"
@@ -257,7 +257,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
                     value={initialPaidAmount}
                     onChange={(e) => setInitialPaidAmount(e.target.value)}
                     placeholder="Ex: 20000"
-                    className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm font-medium text-amber-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm font-medium text-warning focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
                   />
                 </div>
               )}
@@ -266,19 +266,19 @@ export default function OperationForm({ categories: initialCategories, accounts,
         </div>
 
         {/* Section Tiers & Date */}
-        <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800 space-y-5">
+        <div className="bg-surface rounded-2xl p-5 border border-border space-y-5">
           {/* Client / Fournisseur */}
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-300">
+            <label className="block text-sm font-medium text-primary-text">
               {operationType === "income" ? "Client" : "Fournisseur"}
-              {settlementMode === "paid" && <span className="text-gray-500 font-normal ml-1">(Facultatif)</span>}
-              {settlementMode !== "paid" && <span className="text-red-400 ml-1">*</span>}
+              {settlementMode === "paid" && <span className="text-muted font-normal ml-1">(Facultatif)</span>}
+              {settlementMode !== "paid" && <span className="text-danger ml-1">*</span>}
             </label>
             <div className="flex gap-2">
               <select
                 value={partyId}
                 onChange={(e) => setPartyId(e.target.value)}
-                className="flex-1 rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:border-blue-500 appearance-none"
+                className="flex-1 rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:border-accent appearance-none"
               >
                 <option value="">Sélectionner...</option>
                 {filteredParties.map(p => (
@@ -288,7 +288,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
               <button
                 type="button"
                 onClick={() => setShowPartyModal(true)}
-                className="rounded-xl bg-gray-800 border border-gray-700 px-4 text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
+                className="rounded-xl bg-surface-hover border border-border px-4 text-muted hover:text-primary-text hover:border-gray-500 transition-colors"
                 title="Nouveau"
               >
                 +
@@ -299,27 +299,27 @@ export default function OperationForm({ categories: initialCategories, accounts,
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Date */}
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-gray-300">Date</label>
+              <label className="block text-sm font-medium text-primary-text">Date</label>
               <input
                 type="date"
                 value={operationDate}
                 onChange={(e) => setOperationDate(e.target.value)}
-                className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:border-blue-500 appearance-none"
+                className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:border-accent appearance-none"
               />
             </div>
           </div>
 
           {/* Description */}
           <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-300">
-              Description <span className="text-gray-500 font-normal">(Facultatif)</span>
+            <label className="block text-sm font-medium text-primary-text">
+              Description <span className="text-muted font-normal">(Facultatif)</span>
             </label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Ex: Achat sacs aliment 50kg..."
-              className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:border-blue-500"
+              className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:border-accent"
             />
           </div>
         </div>
@@ -328,7 +328,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 py-4 text-sm font-bold text-white shadow-lg shadow-blue-900/20 transition-all disabled:opacity-50"
+          className="w-full rounded-xl bg-accent hover:bg-accent-hover py-4 text-sm font-bold text-primary-text shadow-lg shadow-blue-900/20 transition-all disabled:opacity-50"
         >
           {isPending ? "Enregistrement..." : "Enregistrer l'opération"}
         </button>

@@ -39,13 +39,13 @@ export default function CategoriesList({ categories, isAdmin }: CategoriesListPr
   return (
     <div className="space-y-4">
       {/* Onglets */}
-      <div className="flex gap-1 rounded-xl bg-gray-900 p-1 border border-gray-800">
+      <div className="flex gap-1 rounded-xl bg-surface p-1 border border-border">
         <button
           onClick={() => setActiveTab("income")}
           className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-all ${
             activeTab === "income"
-              ? "bg-emerald-600 text-white shadow-lg"
-              : "text-gray-400 hover:text-gray-200"
+              ? "bg-emerald-600 text-primary-text shadow-lg"
+              : "text-muted hover:text-primary-text"
           }`}
         >
           Recettes ({incomeCount})
@@ -54,8 +54,8 @@ export default function CategoriesList({ categories, isAdmin }: CategoriesListPr
           onClick={() => setActiveTab("expense")}
           className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-all ${
             activeTab === "expense"
-              ? "bg-red-600 text-white shadow-lg"
-              : "text-gray-400 hover:text-gray-200"
+              ? "bg-red-600 text-primary-text shadow-lg"
+              : "text-muted hover:text-primary-text"
           }`}
         >
           Dépenses ({expenseCount})
@@ -66,7 +66,7 @@ export default function CategoriesList({ categories, isAdmin }: CategoriesListPr
       {isAdmin && (
         <button
           onClick={() => { setEditCategory(null); setShowForm(true); }}
-          className="w-full rounded-xl bg-gray-900 border border-dashed border-gray-700 py-3 text-sm font-medium text-gray-400 hover:border-gray-500 hover:text-gray-200 transition-all"
+          className="w-full rounded-xl bg-surface border border-dashed border-border py-3 text-sm font-medium text-muted hover:border-gray-500 hover:text-primary-text transition-all"
         >
           + Nouvelle catégorie
         </button>
@@ -75,17 +75,17 @@ export default function CategoriesList({ categories, isAdmin }: CategoriesListPr
       {/* Liste */}
       <div className="space-y-2">
         {filtered.length === 0 ? (
-          <div className="rounded-xl bg-gray-900 p-8 text-center border border-gray-800">
-            <p className="text-gray-500">Aucune catégorie trouvée.</p>
+          <div className="rounded-xl bg-surface p-8 text-center border border-border">
+            <p className="text-muted">Aucune catégorie trouvée.</p>
           </div>
         ) : (
           filtered.map((cat) => (
             <div
               key={cat.id}
-              className={`rounded-xl bg-gray-900 p-4 border transition-all ${
+              className={`rounded-xl bg-surface p-4 border transition-all ${
                 cat.status === "inactive"
-                  ? "border-gray-800/50 opacity-60"
-                  : "border-gray-800"
+                  ? "border-border/50 opacity-60"
+                  : "border-border"
               }`}
             >
               <div className="flex items-center justify-between">
@@ -94,18 +94,18 @@ export default function CategoriesList({ categories, isAdmin }: CategoriesListPr
                     className={`h-2 w-2 rounded-full flex-shrink-0 ${
                       cat.status === "active"
                         ? activeTab === "income"
-                          ? "bg-emerald-500"
-                          : "bg-red-500"
+                          ? "bg-success"
+                          : "bg-danger"
                         : "bg-gray-600"
                     }`}
                   />
                   <div className="min-w-0">
                     <p className={`text-sm font-medium truncate ${
-                      cat.status === "inactive" ? "text-gray-500 line-through" : "text-gray-100"
+                      cat.status === "inactive" ? "text-muted line-through" : "text-primary-text"
                     }`}>
                       {cat.name}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-muted mt-0.5">
                       {cat.status === "active" ? "Active" : "Désactivée"}
                     </p>
                   </div>
@@ -115,7 +115,7 @@ export default function CategoriesList({ categories, isAdmin }: CategoriesListPr
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={() => handleEdit(cat)}
-                      className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-colors"
+                      className="rounded-lg p-1.5 text-muted hover:bg-surface-hover hover:text-primary-text transition-colors"
                       title="Modifier"
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -127,8 +127,8 @@ export default function CategoriesList({ categories, isAdmin }: CategoriesListPr
                       disabled={isPending}
                       className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
                         cat.status === "active"
-                          ? "bg-gray-800 text-gray-400 hover:bg-red-950 hover:text-red-400"
-                          : "bg-gray-800 text-gray-400 hover:bg-emerald-950 hover:text-emerald-400"
+                          ? "bg-surface-hover text-muted hover:bg-red-950 hover:text-danger"
+                          : "bg-surface-hover text-muted hover:bg-emerald-950 hover:text-success"
                       }`}
                     >
                       {cat.status === "active" ? "Désactiver" : "Réactiver"}

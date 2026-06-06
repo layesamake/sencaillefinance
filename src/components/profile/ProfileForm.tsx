@@ -41,37 +41,37 @@ export default function ProfileForm({ profile, user }: ProfileFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {error && <div className="p-3 bg-red-950/50 text-red-400 text-sm rounded-xl border border-red-900/50">{error}</div>}
-      {success && <div className="p-3 bg-emerald-950/50 text-emerald-400 text-sm rounded-xl border border-emerald-900/50">Profil mis à jour avec succès.</div>}
+      {error && <div className="p-3 bg-red-950/50 text-danger text-sm rounded-xl border border-red-900/50">{error}</div>}
+      {success && <div className="p-3 bg-emerald-950/50 text-success text-sm rounded-xl border border-emerald-900/50">Profil mis à jour avec succès.</div>}
 
       <div>
-        <label className="block text-sm text-gray-400 mb-1">Email (non modifiable)</label>
-        <input type="email" disabled value={user.email || ""} className="w-full rounded-xl bg-gray-900 border border-gray-800 px-4 py-3 text-sm text-gray-500 cursor-not-allowed" />
+        <label className="block text-sm text-muted mb-1">Email (non modifiable)</label>
+        <input type="email" disabled value={user.email || ""} className="w-full rounded-xl bg-surface border border-border px-4 py-3 text-sm text-muted cursor-not-allowed" />
       </div>
 
       <div>
-        <label className="block text-sm text-gray-400 mb-1">Rôle</label>
-        <div className="w-full rounded-xl bg-gray-900 border border-gray-800 px-4 py-3 text-sm text-gray-400 font-semibold">
+        <label className="block text-sm text-muted mb-1">Rôle</label>
+        <div className="w-full rounded-xl bg-surface border border-border px-4 py-3 text-sm text-muted font-semibold">
           {profile.role === "admin" ? "Administrateur" : "Utilisateur simple"}
         </div>
       </div>
 
       <div className="pt-2">
-        <label className="block text-sm text-gray-400 mb-1">Nom complet</label>
-        <input required type="text" value={fullName} onChange={e => setFullName(e.target.value)} className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:outline-none focus:border-blue-500" />
+        <label className="block text-sm text-muted mb-1">Nom complet</label>
+        <input required type="text" value={fullName} onChange={e => setFullName(e.target.value)} className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:outline-none focus:border-accent" />
       </div>
 
       <div>
-        <label className="block text-sm text-gray-400 mb-1">Téléphone</label>
-        <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:outline-none focus:border-blue-500" />
+        <label className="block text-sm text-muted mb-1">Téléphone</label>
+        <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:outline-none focus:border-accent" />
       </div>
 
-      <div className="pt-4 border-t border-gray-800">
-        <label className="block text-sm text-gray-400 mb-1">Nouveau mot de passe (optionnel)</label>
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Laissez vide pour ne pas changer" minLength={6} className="w-full rounded-xl bg-gray-800 border border-gray-700 px-4 py-3 text-sm text-gray-100 focus:outline-none focus:border-blue-500" />
+      <div className="pt-4 border-t border-border">
+        <label className="block text-sm text-muted mb-1">Nouveau mot de passe (optionnel)</label>
+        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Laissez vide pour ne pas changer" minLength={6} className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:outline-none focus:border-accent" />
       </div>
 
-      <button type="submit" disabled={isPending} className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl text-white font-bold transition-all disabled:opacity-50 mt-4">
+      <button type="submit" disabled={isPending} className="w-full py-3 bg-accent hover:bg-accent-hover rounded-xl text-primary-text font-bold transition-all disabled:opacity-50 mt-4">
         {isPending ? "Enregistrement..." : "Enregistrer les modifications"}
       </button>
     </form>

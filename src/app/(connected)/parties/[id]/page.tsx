@@ -33,12 +33,12 @@ export default async function PartyDetailsPage({ params }: { params: { id: strin
       <PartyHeader party={party} totalOwed={totalOwed} />
 
       <div className="pt-4">
-        <h2 className="text-lg font-bold text-gray-100 mb-4">Historique des opérations</h2>
+        <h2 className="text-lg font-bold text-primary-text mb-4">Historique des opérations</h2>
         {operations.length > 0 ? (
           <OperationsList operations={operations} accounts={accounts} />
         ) : (
-          <div className="text-center py-10 bg-gray-900 border border-gray-800 rounded-3xl">
-            <p className="text-gray-500">Aucune opération pour ce tiers.</p>
+          <div className="text-center py-10 bg-surface border border-border rounded-3xl">
+            <p className="text-muted">Aucune opération pour ce tiers.</p>
           </div>
         )}
       </div>

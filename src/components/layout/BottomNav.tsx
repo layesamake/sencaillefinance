@@ -16,7 +16,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-gray-950 border-t border-gray-800 pb-safe z-50">
+    <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-background border-t border-border pb-safe z-50 transition-colors duration-300">
       <div className="flex justify-around items-center h-16">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -29,7 +29,7 @@ export default function BottomNav() {
               key={item.name}
               href={item.href}
               className={`flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors ${
-                isActive ? "text-blue-500" : "text-gray-400 hover:text-gray-100"
+                isActive ? "text-accent" : "text-muted hover:text-primary-text"
               }`}
             >
               <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />

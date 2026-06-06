@@ -24,12 +24,12 @@ export default function PartiesList({ parties, userRole }: { parties: Party[], u
           placeholder="Rechercher un nom..." 
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 rounded-xl bg-gray-900 border border-gray-800 px-4 py-3 text-sm text-gray-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="flex-1 rounded-xl bg-surface border border-border px-4 py-3 text-sm text-primary-text focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
         />
         <select 
           value={filter}
           onChange={(e) => setFilter(e.target.value as any)}
-          className="rounded-xl bg-gray-900 border border-gray-800 px-4 py-3 text-sm text-gray-100 focus:border-blue-500 focus:outline-none"
+          className="rounded-xl bg-surface border border-border px-4 py-3 text-sm text-primary-text focus:border-accent focus:outline-none"
         >
           <option value="all">Tous les types</option>
           <option value="customer">Clients</option>
@@ -39,8 +39,8 @@ export default function PartiesList({ parties, userRole }: { parties: Party[], u
 
       <div className="space-y-3">
         {filteredParties.length === 0 ? (
-          <div className="text-center py-10 bg-gray-900 border border-gray-800 rounded-3xl">
-            <p className="text-gray-500">Aucun résultat trouvé.</p>
+          <div className="text-center py-10 bg-surface border border-border rounded-3xl">
+            <p className="text-muted">Aucun résultat trouvé.</p>
           </div>
         ) : (
           filteredParties.map(party => (

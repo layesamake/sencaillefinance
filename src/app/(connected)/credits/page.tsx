@@ -28,36 +28,36 @@ export default async function CreditsPage() {
     <div className="p-4 max-w-2xl mx-auto space-y-6 pb-24">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-100">Suivi des Crédits</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-primary-text">Suivi des Crédits</h1>
+        <p className="text-sm text-muted mt-1">
           Gérez vos créances clients et dettes fournisseurs
         </p>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-5 relative overflow-hidden">
+        <div className="bg-surface border border-border rounded-3xl p-5 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-5">
             <ArrowDownRight size={80} />
           </div>
-          <div className="flex items-center space-x-2 text-emerald-400 mb-2">
+          <div className="flex items-center space-x-2 text-success mb-2">
             <ArrowDownRight size={20} />
             <p className="text-xs font-bold uppercase tracking-wider">Créances</p>
           </div>
-          <p className="text-2xl font-black text-gray-100">{totalReceivables.toLocaleString("fr-FR")} F</p>
-          <p className="text-xs text-gray-500 mt-1">À recouvrer</p>
+          <p className="text-2xl font-black text-primary-text">{totalReceivables.toLocaleString("fr-FR")} F</p>
+          <p className="text-xs text-muted mt-1">À recouvrer</p>
         </div>
         
-        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-5 relative overflow-hidden">
+        <div className="bg-surface border border-border rounded-3xl p-5 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-5">
             <ArrowUpRight size={80} />
           </div>
-          <div className="flex items-center space-x-2 text-red-400 mb-2">
+          <div className="flex items-center space-x-2 text-danger mb-2">
             <ArrowUpRight size={20} />
             <p className="text-xs font-bold uppercase tracking-wider">Dettes</p>
           </div>
-          <p className="text-2xl font-black text-gray-100">{totalDebts.toLocaleString("fr-FR")} F</p>
-          <p className="text-xs text-gray-500 mt-1">À payer</p>
+          <p className="text-2xl font-black text-primary-text">{totalDebts.toLocaleString("fr-FR")} F</p>
+          <p className="text-xs text-muted mt-1">À payer</p>
         </div>
       </div>
 

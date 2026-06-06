@@ -63,6 +63,8 @@ export async function getDashboardStats() {
     }
   });
 
+  totalBalance = Object.values(accountBalances).reduce((a, b) => a + b, 0);
+
   return {
     totalBalance,
     totalReceivables,

@@ -25,6 +25,32 @@ export default function ExportPdfButton({ operations }: ExportPdfButtonProps) {
     doc.setTextColor(100);
     doc.text(`Généré le ${format(new Date(), "dd MMMM yyyy à HH:mm", { locale: fr })}`, 14, 30);
 
+    // Calcul des totaux
+    const totalRevenus = operations
+      .filter(op => op.operation_type === "income")
+      .reduce((sum, op) => sum + op.total_amount, 0);
+      
+    const totalDepenses = operations
+      .filter(op => op.operation_type === "expense")
+      .reduce((sum, op) => sum + op.total_amount, 0);
+      
+    const solde = totalRevenus - totalDepenses;
+
+    doc.setFontSize(10);
+    doc.setTextColor(50, 50, 50);
+    doc.text(`Total Revenus: ${totalRevenus.toLocaleString("fr-FR")} F`, 14, 38);
+    doc.text(`Total Dépenses: ${totalDepenses.toLocaleString("fr-FR")} F`, 14, 43);
+    
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    if (solde >= 0) {
+      doc.setTextColor(22, 163, 74); // green-600
+    } else {
+      doc.setTextColor(220, 38, 38); // red-600
+    }
+    doc.text(`Solde Net: ${solde.toLocaleString("fr-FR")} F`, 14, 49);
+    doc.setFont("helvetica", "normal"); // reset font for table
+
     // Préparation des données
     const tableColumn = ["Date", "Type", "Catégorie", "Tiers", "Total", "Payé", "Reste"];
     const tableRows = operations.map(op => {
@@ -50,7 +76,7 @@ export default function ExportPdfButton({ operations }: ExportPdfButtonProps) {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 40,
+      startY: 56,
       styles: { fontSize: 9 },
       headStyles: { fillColor: [31, 41, 55] }, // gris sombre
       alternateRowStyles: { fillColor: [249, 250, 251] }, // gris très clair

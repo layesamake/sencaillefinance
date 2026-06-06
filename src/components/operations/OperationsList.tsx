@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import type { OperationWithDetails } from "@/types/database";
+import type { OperationWithDetails, Account } from "@/types/database";
 import OperationCard from "./OperationCard";
 import OperationDetailsModal from "./OperationDetailsModal";
 
 interface OperationsListProps {
   operations: OperationWithDetails[];
+  accounts: Account[];
 }
 
-export default function OperationsList({ operations }: OperationsListProps) {
+export default function OperationsList({ operations, accounts }: OperationsListProps) {
   const [selectedOp, setSelectedOp] = useState<OperationWithDetails | null>(null);
 
   if (operations.length === 0) {
@@ -38,6 +39,7 @@ export default function OperationsList({ operations }: OperationsListProps) {
       {selectedOp && (
         <OperationDetailsModal 
           operation={selectedOp} 
+          accounts={accounts}
           onClose={() => setSelectedOp(null)} 
         />
       )}

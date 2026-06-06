@@ -24,7 +24,7 @@ export default function TopBar({ role, fullName }: TopBarProps) {
 
   const adminMenuItems = [
     { name: "Catégories", href: "/categories", icon: Grid },
-    { name: "Utilisateurs", href: "/users", icon: Users },
+    { name: "Utilisateurs", href: "/settings/users", icon: Users },
     { name: "Paramètres", href: "/settings", icon: Settings },
   ];
 
@@ -58,6 +58,19 @@ export default function TopBar({ role, fullName }: TopBarProps) {
           </div>
 
           <nav className="flex-1 overflow-y-auto py-4 px-4 space-y-2">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2">
+              Menu Principal
+            </div>
+            <Link
+              href="/parties"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center space-x-3 w-full p-3 rounded-lg text-gray-300 hover:bg-gray-900 hover:text-white transition-colors"
+            >
+              <Users size={20} />
+              <span className="font-medium">Tiers (Clients/Fourn.)</span>
+            </Link>
+            
+            <div className="h-px bg-gray-800 my-4"></div>
             {role === "admin" && (
               <>
                 <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 mt-4 px-2">

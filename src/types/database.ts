@@ -93,4 +93,5 @@ export interface OperationWithDetails extends Operation {
   parties?: { name: string; phone?: string | null };
   accounts?: { name: string };
   profiles?: { full_name: string };
+  payments?: { id: string; amount: number; payment_date: string; status: string; accounts?: { name: string } }[];
 }

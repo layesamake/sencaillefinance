@@ -12,8 +12,8 @@ export default function OperationCard({ operation, onClick }: OperationCardProps
   const amountColor = isIncome ? "text-emerald-400" : "text-red-400";
   const bgBadgeColor = isIncome ? "bg-emerald-500/20 text-emerald-300" : "bg-red-500/20 text-red-300";
 
-  const restant = operation.total_amount - operation.initial_paid_amount;
-  // TODO: Prendre en compte les paiements ultérieurs de la table payments quand elle sera gérée
+  const sumPayments = operation.payments?.filter(p => p.status === 'active').reduce((sum, p) => sum + p.amount, 0) || 0;
+  const restant = operation.total_amount - operation.initial_paid_amount - sumPayments;
   
   const statusLabels: Record<string, string> = {
     paid: "Payé",

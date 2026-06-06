@@ -29,3 +29,23 @@ export async function getActiveParties(type?: "customer" | "supplier"): Promise<
 
   return data as Party[];
 }
+
+/**
+ * Récupère les détails d'un tiers spécifique.
+ */
+export async function getPartyDetails(id: string): Promise<Party | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("parties")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("[getPartyDetails] Erreur:", error);
+    return null;
+  }
+
+  return data as Party;
+}

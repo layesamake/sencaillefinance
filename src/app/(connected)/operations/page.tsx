@@ -1,5 +1,6 @@
 import { getOperations, type OperationsFilters as QueryFilters } from "@/lib/queries/operations";
 import { getActiveCategories } from "@/lib/queries/categories";
+import { getActiveAccounts } from "@/lib/queries/accounts";
 import OperationsList from "@/components/operations/OperationsList";
 import OperationsFilters from "@/components/operations/OperationsFilters";
 
@@ -18,15 +19,19 @@ export default async function OperationsPage({
     paymentStatus: (params.paymentStatus as any) || "all",
   };
 
-  const [operations, categories] = await Promise.all([
+  const [operations, categories, accounts] = await Promise.all([
     getOperations(filters),
-    getActiveCategories()
+    getActiveCategories(),
+    getActiveAccounts()
   ]);
 
   // Calcul des résumés
   const totalAmount = operations.reduce((sum, op) => sum + op.total_amount, 0);
-  const totalPaid = operations.reduce((sum, op) => sum + op.initial_paid_amount, 0);
-  const totalCredit = operations.reduce((sum, op) => sum + (op.total_amount - op.initial_paid_amount), 0);
+  const totalPaid = operations.reduce((sum, op) => {
+    const sumPayments = op.payments?.filter(p => p.status === 'active').reduce((s, p) => s + p.amount, 0) || 0;
+    return sum + op.initial_paid_amount + sumPayments;
+  }, 0);
+  const totalCredit = totalAmount - totalPaid;
 
   return (
     <div className="p-4 max-w-2xl mx-auto space-y-6 pb-24">
@@ -53,7 +58,7 @@ export default async function OperationsPage({
         </div>
       )}
 
-      <OperationsList operations={operations} />
+      <OperationsList operations={operations} accounts={accounts} />
     </div>
   );
 }

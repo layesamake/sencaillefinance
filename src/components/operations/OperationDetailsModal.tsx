@@ -1,17 +1,25 @@
-import type { OperationWithDetails } from "@/types/database";
+import { useState } from "react";
+import type { OperationWithDetails, Account } from "@/types/database";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import PaymentModal from "./PaymentModal";
+import { deletePaymentAction } from "@/app/(connected)/operations/actions";
 
 interface OperationDetailsModalProps {
   operation: OperationWithDetails;
+  accounts: Account[];
   onClose: () => void;
 }
 
-export default function OperationDetailsModal({ operation, onClose }: OperationDetailsModalProps) {
+export default function OperationDetailsModal({ operation, accounts, onClose }: OperationDetailsModalProps) {
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const isIncome = operation.operation_type === "income";
   const amountColor = isIncome ? "text-emerald-400" : "text-red-400";
   
-  const restant = operation.total_amount - operation.initial_paid_amount;
+  const activePayments = operation.payments?.filter(p => p.status === 'active') || [];
+  const sumPayments = activePayments.reduce((sum, p) => sum + p.amount, 0);
+  const restant = operation.total_amount - operation.initial_paid_amount - sumPayments;
   
   const statusLabels: Record<string, string> = {
     paid: "Payé totalement",
@@ -61,7 +69,61 @@ export default function OperationDetailsModal({ operation, onClose }: OperationD
             )}
 
             {restant > 0 && (
-              <DetailRow label="Reste à payer" value={`${restant.toLocaleString("fr-FR")} F`} valueColor="text-amber-400" />
+              <div className="pt-2">
+                <DetailRow label="Reste à payer" value={`${restant.toLocaleString("fr-FR")} F`} valueColor="text-amber-400" />
+                <button
+                  onClick={() => setShowPaymentModal(true)}
+                  className="mt-3 w-full py-2.5 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 rounded-xl text-sm font-semibold transition-colors"
+                >
+                  Saisir un paiement
+                </button>
+              </div>
+            )}
+
+            {activePayments.length > 0 && (
+              <div className="pt-4 border-t border-gray-800 space-y-3">
+                <h3 className="text-sm font-bold text-gray-300">Historique des paiements</h3>
+                {activePayments.map(p => (
+                  <div key={p.id} className="flex justify-between items-center bg-gray-800/50 p-3 rounded-xl border border-gray-700/50 group">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-200">{p.amount.toLocaleString("fr-FR")} F</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {format(new Date(p.payment_date), "dd MMM yyyy", { locale: fr })} • {p.accounts?.name || "Compte inconnu"}
+                      </p>
+                    </div>
+                    <button 
+                      disabled={isPending}
+                      onClick={() => {
+                        if(confirm("Voulez-vous vraiment annuler ce paiement ?")) {
+                          startTransition(async () => {
+                            await deletePaymentAction(p.id);
+                            onClose();
+                          });
+                        }
+                      }}
+                      className="p-2 text-gray-500 hover:text-red-400 bg-gray-900/50 rounded-xl opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50 sm:block hidden"
+                      title="Supprimer ce paiement"
+                    >
+                      🗑️
+                    </button>
+                    <button 
+                      disabled={isPending}
+                      onClick={() => {
+                        if(confirm("Voulez-vous vraiment annuler ce paiement ?")) {
+                          startTransition(async () => {
+                            await deletePaymentAction(p.id);
+                            onClose();
+                          });
+                        }
+                      }}
+                      className="p-2 text-gray-500 hover:text-red-400 bg-gray-900/50 rounded-xl transition-all disabled:opacity-50 block sm:hidden"
+                      title="Supprimer ce paiement"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
 
             {(operation.parties || operation.settlement_mode !== "paid") && (
@@ -87,6 +149,19 @@ export default function OperationDetailsModal({ operation, onClose }: OperationD
           </div>
         </div>
       </div>
+
+      {showPaymentModal && (
+        <PaymentModal
+          operationId={operation.id}
+          restant={restant}
+          accounts={accounts}
+          onClose={() => setShowPaymentModal(false)}
+          onSuccess={() => {
+            setShowPaymentModal(false);
+            onClose(); // Ferme les détails pour voir la liste rafraîchie
+          }}
+        />
+      )}
     </div>
   );
 }

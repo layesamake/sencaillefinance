@@ -95,3 +95,84 @@ export async function submitOperationAction(formData: FormData) {
   
   return { success: true };
 }
+
+export async function submitPaymentAction(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Non connecté" };
+
+  const operationId = formData.get("operation_id") as string;
+  const accountId = formData.get("account_id") as string;
+  const amount = parseFloat(formData.get("amount") as string);
+  const paymentDate = formData.get("payment_date") as string;
+  const description = formData.get("description") as string;
+
+  if (!operationId || !accountId || !amount || !paymentDate) {
+    return { error: "Veuillez remplir tous les champs obligatoires." };
+  }
+
+  if (amount <= 0) {
+    return { error: "Le montant doit être supérieur à zéro." };
+  }
+
+  // Vérifier que le montant ne dépasse pas le reste à payer
+  const { data: op } = await supabase
+    .from("operations")
+    .select('total_amount, initial_paid_amount, payments(amount, status)')
+    .eq('id', operationId)
+    .single();
+
+  if (op) {
+    const sumPayments = op.payments?.filter((p: any) => p.status === 'active').reduce((sum: number, p: any) => sum + p.amount, 0) || 0;
+    const restant = op.total_amount - op.initial_paid_amount - sumPayments;
+    
+    if (amount > restant) {
+      return { error: `Le montant (${amount} F) dépasse le reste à payer (${restant} F).` };
+    }
+  }
+
+  const { error } = await supabase.from("payments").insert({
+    operation_id: operationId,
+    account_id: accountId,
+    amount,
+    payment_date: paymentDate,
+    description: description ? description.trim() : null,
+    created_by: user.id
+  });
+
+  if (error) {
+    console.error("[submitPaymentAction] Erreur:", error);
+    return { error: "Erreur lors de l'enregistrement du paiement." };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/operations");
+  
+  return { success: true };
+}
+
+export async function deletePaymentAction(paymentId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Non connecté" };
+
+  const { error } = await supabase.from("payments").update({
+    status: "deleted",
+    deleted_by: user.id,
+    deleted_at: new Date().toISOString()
+  }).eq("id", paymentId);
+
+  if (error) {
+    console.error("[deletePaymentAction] Erreur:", error);
+    return { error: "Erreur lors de la suppression du paiement." };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/operations");
+  revalidatePath("/credits");
+  revalidatePath("/dashboard");
+  
+  return { success: true };
+}

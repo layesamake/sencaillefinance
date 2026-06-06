@@ -6,7 +6,8 @@ export interface OperationsFilters {
   type?: OperationType | "all";
   categoryId?: string | "all";
   settlementMode?: SettlementMode | "all";
-  paymentStatus?: "paid" | "unpaid" | "partial" | "all";
+  paymentStatus?: "paid" | "unpaid" | "partial" | "pending" | "all";
+  partyId?: string;
   dateStart?: string;
   dateEnd?: string;
 }
@@ -20,8 +21,9 @@ export async function getOperations(filters?: OperationsFilters): Promise<Operat
       *,
       categories ( name ),
       parties ( name, phone ),
-      accounts!operations_initial_account_id_fkey ( name ),
-      profiles!operations_created_by_fkey ( full_name )
+      accounts ( name ),
+      profiles!created_by ( full_name ),
+      payments ( id, amount, payment_date, status, accounts ( name ) )
     `)
     .eq("status", "active")
     .order("operation_date", { ascending: false })
@@ -36,6 +38,9 @@ export async function getOperations(filters?: OperationsFilters): Promise<Operat
     }
     if (filters.settlementMode && filters.settlementMode !== "all") {
       query = query.eq("settlement_mode", filters.settlementMode);
+    }
+    if (filters.partyId) {
+      query = query.eq("party_id", filters.partyId);
     }
     if (filters.paymentStatus && filters.paymentStatus !== "all") {
       if (filters.paymentStatus === "paid") {
@@ -79,13 +84,17 @@ export async function getOperations(filters?: OperationsFilters): Promise<Operat
   // Post-filtrage pour paymentStatus (car la comparaison de 2 colonnes SQL est compliquée en postgrest simple)
   if (filters?.paymentStatus && filters.paymentStatus !== "all") {
     results = results.filter(op => {
-      // Simplification V1 (sans compter les futurs payments de la table payments)
-      const isPaid = op.initial_paid_amount >= op.total_amount;
-      const isUnpaid = op.initial_paid_amount === 0;
+      // Calcul du total payé : avance + tous les paiements actifs
+      const sumPayments = op.payments?.filter(p => p.status === 'active').reduce((sum, p) => sum + p.amount, 0) || 0;
+      const totalPaid = op.initial_paid_amount + sumPayments;
+      
+      const isPaid = totalPaid >= op.total_amount;
+      const isUnpaid = totalPaid === 0;
       
       if (filters.paymentStatus === "paid") return isPaid;
       if (filters.paymentStatus === "unpaid") return isUnpaid;
       if (filters.paymentStatus === "partial") return !isPaid && !isUnpaid;
+      if (filters.paymentStatus === "pending") return !isPaid;
       return true;
     });
   }

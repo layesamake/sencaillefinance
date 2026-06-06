@@ -20,3 +20,22 @@ export async function getActiveAccounts(): Promise<Account[]> {
 
   return data as Account[];
 }
+
+/**
+ * Récupère tous les comptes financiers (actifs et inactifs)
+ */
+export async function getAllAccounts(): Promise<Account[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("accounts")
+    .select("*")
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("[getAllAccounts] Erreur:", error);
+    return [];
+  }
+
+  return data as Account[];
+}

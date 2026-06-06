@@ -1,14 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import type { Party } from "@/types/database";
 import PartyCard from "./PartyCard";
 import EditPartyModal from "./EditPartyModal";
+import QuickPartyModal from "./QuickPartyModal";
 
 export default function PartiesList({ parties, userRole }: { parties: Party[], userRole?: string }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<"all" | "customer" | "supplier">("all");
   const [search, setSearch] = useState("");
   const [editingParty, setEditingParty] = useState<Party | null>(null);
+  const [isAdding, setIsAdding] = useState<"customer" | "supplier" | null>(null);
 
   const filteredParties = parties.filter(p => {
     if (filter !== "all" && p.party_type !== filter && p.party_type !== "both") return false;
@@ -35,6 +40,14 @@ export default function PartiesList({ parties, userRole }: { parties: Party[], u
           <option value="customer">Clients</option>
           <option value="supplier">Fournisseurs</option>
         </select>
+        
+        <button 
+          onClick={() => setIsAdding(filter === "supplier" ? "supplier" : "customer")}
+          className="flex items-center justify-center space-x-2 bg-accent hover:bg-accent-hover text-accent-foreground px-4 py-3 rounded-xl transition-colors font-medium text-sm whitespace-nowrap"
+        >
+          <Plus size={18} />
+          <span>Nouveau</span>
+        </button>
       </div>
 
       <div className="space-y-3">
@@ -56,6 +69,17 @@ export default function PartiesList({ parties, userRole }: { parties: Party[], u
 
       {editingParty && (
         <EditPartyModal party={editingParty} onClose={() => setEditingParty(null)} />
+      )}
+      
+      {isAdding && (
+        <QuickPartyModal 
+          partyType={isAdding} 
+          onClose={() => setIsAdding(null)} 
+          onCreated={(party) => {
+            setIsAdding(null);
+            router.refresh();
+          }} 
+        />
       )}
     </div>
   );

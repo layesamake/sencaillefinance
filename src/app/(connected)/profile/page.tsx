@@ -1,9 +1,37 @@
-export default function ProfilePage() {
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import ProfileForm from "@/components/profile/ProfileForm";
+import type { Profile } from "@/types/database";
+
+export default async function ProfilePage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile) {
+    return <div className="p-4 text-center">Profil introuvable</div>;
+  }
+
   return (
-    <div className="p-4 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-100">Mon profil</h1>
-      <div className="rounded-xl bg-gray-900 p-5 border border-gray-800">
-        <p className="text-gray-400">Informations du profil à venir.</p>
+    <div className="p-4 max-w-xl mx-auto space-y-6 pb-24">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-100">Mon profil</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Gérez vos informations personnelles et votre sécurité
+        </p>
+      </div>
+      
+      <div className="rounded-3xl bg-gray-900 p-6 border border-gray-800 shadow-xl">
+        <ProfileForm profile={profile as Profile} user={user} />
       </div>
     </div>
   );

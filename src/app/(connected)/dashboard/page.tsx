@@ -44,6 +44,19 @@ export default async function DashboardPage() {
         </p>
       </div>
 
+      {/* Individual Accounts Balances */}
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+        {accounts.map(acc => {
+          const balance = stats.accountBalances[acc.id] || 0;
+          return (
+            <div key={acc.id} className="min-w-[140px] flex-shrink-0 bg-surface border border-border rounded-2xl p-4 flex flex-col justify-between">
+              <p className="text-xs font-semibold text-muted uppercase truncate mb-2">{acc.name}</p>
+              <p className="text-lg font-bold text-primary-text">{balance.toLocaleString("fr-FR")} <span className="text-sm text-accent">F</span></p>
+            </div>
+          );
+        })}
+      </div>
+
       {/* Debts and Receivables */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-surface border border-border rounded-3xl p-5">

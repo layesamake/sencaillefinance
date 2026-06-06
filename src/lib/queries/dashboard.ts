@@ -8,6 +8,10 @@ export async function getDashboardStats() {
   ]);
 
   let totalBalance = accounts.reduce((sum, acc) => sum + acc.opening_balance, 0);
+  
+  const accountBalances: Record<string, number> = {};
+  accounts.forEach(acc => accountBalances[acc.id] = acc.opening_balance);
+
   let totalReceivables = 0;
   let totalDebts = 0;
   let thisMonthIncome = 0;
@@ -30,10 +34,32 @@ export async function getDashboardStats() {
       totalBalance += totalPaid;
       if (remaining > 0) totalReceivables += remaining;
       if (isThisMonth) thisMonthIncome += op.total_amount;
+      
+      if (op.initial_account_id && op.initial_paid_amount > 0) {
+        if (accountBalances[op.initial_account_id] !== undefined) {
+          accountBalances[op.initial_account_id] += op.initial_paid_amount;
+        }
+      }
+      activePayments.forEach(p => {
+        if (p.account_id && accountBalances[p.account_id] !== undefined) {
+          accountBalances[p.account_id] += p.amount;
+        }
+      });
     } else {
       totalBalance -= totalPaid;
       if (remaining > 0) totalDebts += remaining;
       if (isThisMonth) thisMonthExpense += op.total_amount;
+
+      if (op.initial_account_id && op.initial_paid_amount > 0) {
+        if (accountBalances[op.initial_account_id] !== undefined) {
+          accountBalances[op.initial_account_id] -= op.initial_paid_amount;
+        }
+      }
+      activePayments.forEach(p => {
+        if (p.account_id && accountBalances[p.account_id] !== undefined) {
+          accountBalances[p.account_id] -= p.amount;
+        }
+      });
     }
   });
 
@@ -43,6 +69,7 @@ export async function getDashboardStats() {
     totalDebts,
     thisMonthIncome,
     thisMonthExpense,
-    recentOperations: operations.slice(0, 5)
+    recentOperations: operations.slice(0, 5),
+    accountBalances
   };
 }

@@ -3,6 +3,7 @@ import { getActiveCategories } from "@/lib/queries/categories";
 import { getActiveAccounts } from "@/lib/queries/accounts";
 import OperationsList from "@/components/operations/OperationsList";
 import OperationsFilters from "@/components/operations/OperationsFilters";
+import ExportPdfButton from "@/components/operations/ExportPdfButton";
 
 export default async function OperationsPage({
   searchParams,
@@ -35,11 +36,14 @@ export default async function OperationsPage({
 
   return (
     <div className="p-4 max-w-2xl mx-auto space-y-6 pb-24">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-100">Historique</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          {operations.length} opération(s) trouvée(s)
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-100">Historique</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            {operations.length} opération(s) trouvée(s)
+          </p>
+        </div>
+        <ExportPdfButton operations={operations} />
       </div>
 
       <OperationsFilters categories={categories} />

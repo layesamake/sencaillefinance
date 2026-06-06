@@ -176,3 +176,105 @@ export async function deletePaymentAction(paymentId: string) {
   
   return { success: true };
 }
+
+export async function submitTransferAction(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Non connecté" };
+
+  const sourceAccountId = formData.get("source_account_id") as string;
+  const destinationAccountId = formData.get("destination_account_id") as string;
+  const amount = parseFloat(formData.get("amount") as string);
+  const transferDate = formData.get("transfer_date") as string;
+  const description = formData.get("description") as string;
+
+  if (!sourceAccountId || !destinationAccountId || !amount || !transferDate) {
+    return { error: "Veuillez remplir tous les champs obligatoires." };
+  }
+
+  if (sourceAccountId === destinationAccountId) {
+    return { error: "Les comptes source et destination doivent être différents." };
+  }
+
+  if (amount <= 0) {
+    return { error: "Le montant doit être supérieur à zéro." };
+  }
+
+  // 1. Get or create Categories
+  const getOrCreateCategory = async (name: string, type: "income" | "expense") => {
+    let { data: cat } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("name", name)
+      .eq("operation_type", type)
+      .eq("status", "active")
+      .single();
+    
+    if (!cat) {
+      const { data: newCat, error } = await supabase.from("categories").insert({
+        name,
+        operation_type: type,
+        status: "active",
+        created_by: user.id
+      }).select("id").single();
+      
+      if (error) throw new Error("Erreur création catégorie");
+      cat = newCat;
+    }
+    return cat.id;
+  };
+
+  try {
+    const expenseCatId = await getOrCreateCategory("Virement Interne (Sortie)", "expense");
+    const incomeCatId = await getOrCreateCategory("Virement Interne (Entrée)", "income");
+
+    // 2. Fetch account names for description if not provided
+    const { data: sourceAcc } = await supabase.from("accounts").select("name").eq("id", sourceAccountId).single();
+    const { data: destAcc } = await supabase.from("accounts").select("name").eq("id", destinationAccountId).single();
+
+    const descExpense = description ? `Transfert: ${description}` : `Transfert vers ${destAcc?.name || "autre compte"}`;
+    const descIncome = description ? `Transfert: ${description}` : `Transfert depuis ${sourceAcc?.name || "autre compte"}`;
+
+    // 3. Create Expense
+    const { error: errorOut } = await supabase.from("operations").insert({
+      operation_type: "expense",
+      category_id: expenseCatId,
+      total_amount: amount,
+      settlement_mode: "paid",
+      initial_paid_amount: amount,
+      initial_account_id: sourceAccountId,
+      party_id: null,
+      operation_date: transferDate,
+      description: descExpense,
+      created_by: user.id
+    });
+
+    if (errorOut) throw errorOut;
+
+    // 4. Create Income
+    const { error: errorIn } = await supabase.from("operations").insert({
+      operation_type: "income",
+      category_id: incomeCatId,
+      total_amount: amount,
+      settlement_mode: "paid",
+      initial_paid_amount: amount,
+      initial_account_id: destinationAccountId,
+      party_id: null,
+      operation_date: transferDate,
+      description: descIncome,
+      created_by: user.id
+    });
+
+    if (errorIn) throw errorIn;
+
+  } catch (error: any) {
+    console.error("[submitTransferAction] Erreur:", error);
+    return { error: "Erreur lors du transfert." };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/operations");
+  
+  return { success: true };
+}

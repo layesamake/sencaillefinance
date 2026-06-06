@@ -13,11 +13,22 @@ export default async function DashboardPage() {
   return (
     <div className="p-4 max-w-2xl mx-auto space-y-6 pb-24">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-primary-text">Tableau de bord</h1>
-        <p className="text-sm text-muted mt-1">
-          Aperçu de votre situation financière
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-primary-text">Tableau de bord</h1>
+          <p className="text-sm text-muted mt-1">
+            Aperçu de votre situation financière
+          </p>
+        </div>
+        <Link 
+          href="/operations/new?tab=transfer"
+          className="p-2 bg-surface border border-border rounded-xl text-accent hover:bg-surface-hover transition-colors"
+          title="Faire un transfert"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+          </svg>
+        </Link>
       </div>
 
       {/* Main Balance Card */}

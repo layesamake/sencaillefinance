@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useMemo } from "react";
 import type { Category, Account, Party, OperationType, SettlementMode } from "@/types/database";
-import { submitOperationAction } from "@/app/(connected)/operations/actions";
+import { submitOperationAction, updateOperationAction } from "@/app/(connected)/operations/actions";
 import QuickCategoryModal from "@/components/categories/QuickCategoryModal";
 import QuickPartyModal from "@/components/parties/QuickPartyModal";
 
@@ -10,23 +10,26 @@ interface OperationFormProps {
   categories: Category[];
   accounts: Account[];
   parties: Party[];
+  initialData?: any; // Contains existing operation data
 }
 
-export default function OperationForm({ categories: initialCategories, accounts, parties: initialParties }: OperationFormProps) {
+export default function OperationForm({ categories: initialCategories, accounts, parties: initialParties, initialData }: OperationFormProps) {
   // State from props that can be extended via quick creation
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [parties, setParties] = useState<Party[]>(initialParties);
 
   // Form State
-  const [operationType, setOperationType] = useState<OperationType>("income");
-  const [categoryId, setCategoryId] = useState<string>("");
-  const [totalAmount, setTotalAmount] = useState<string>("");
-  const [settlementMode, setSettlementMode] = useState<SettlementMode>("paid");
-  const [initialAccountId, setInitialAccountId] = useState<string>("");
-  const [initialPaidAmount, setInitialPaidAmount] = useState<string>("");
-  const [partyId, setPartyId] = useState<string>("");
-  const [operationDate, setOperationDate] = useState<string>(new Date().toISOString().split("T")[0]);
-  const [description, setDescription] = useState<string>("");
+  const [operationType, setOperationType] = useState<OperationType>(initialData?.operation_type || "income");
+  const [categoryId, setCategoryId] = useState<string>(initialData?.category_id || "");
+  const [totalAmount, setTotalAmount] = useState<string>(initialData?.total_amount ? String(initialData.total_amount) : "");
+  const [settlementMode, setSettlementMode] = useState<SettlementMode>(initialData?.settlement_mode || "paid");
+  const [initialAccountId, setInitialAccountId] = useState<string>(initialData?.initial_account_id || "");
+  const [initialPaidAmount, setInitialPaidAmount] = useState<string>(initialData?.initial_paid_amount ? String(initialData.initial_paid_amount) : "");
+  const [partyId, setPartyId] = useState<string>(initialData?.party_id || "");
+  const [operationDate, setOperationDate] = useState<string>(initialData?.operation_date ? new Date(initialData.operation_date).toISOString().split("T")[0] : new Date().toISOString().split("T")[0]);
+  const [description, setDescription] = useState<string>(initialData?.description || "");
+
+  const isEditMode = !!initialData;
 
   // Modals state
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -92,19 +95,25 @@ export default function OperationForm({ categories: initialCategories, accounts,
       formData.set("operation_date", operationDate);
       if (description) formData.set("description", description);
 
-      const result = await submitOperationAction(formData);
+      let result;
+      if (isEditMode) {
+        // En mode édition, on ne peut pas modifier le settlement_mode ni les comptes s'il y a déjà des paiements.
+        // On se fie à ce qui est envoyé et à l'action d'update.
+        result = await updateOperationAction(initialData.id, formData);
+      } else {
+        result = await submitOperationAction(formData);
+      }
 
       if (result.error) {
         setError(result.error);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        // Succès - pour l'instant on redirige ou on affiche un message.
-        // La Server Action a déjà appelé revalidatePath.
-        // On pourrait reset le form ici.
-        setTotalAmount("");
-        setInitialPaidAmount("");
-        setDescription("");
-        alert("Opération enregistrée avec succès !");
+        if (!isEditMode) {
+          setTotalAmount("");
+          setInitialPaidAmount("");
+          setDescription("");
+        }
+        alert(isEditMode ? "Opération modifiée avec succès !" : "Opération enregistrée avec succès !");
       }
     });
   };
@@ -124,6 +133,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
           <div className="flex gap-2">
             <button
               type="button"
+              disabled={isEditMode}
               onClick={() => handleTypeChange("income")}
               className={`flex-1 rounded-xl py-3.5 text-sm font-medium border transition-all ${
                 operationType === "income"
@@ -135,6 +145,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
             </button>
             <button
               type="button"
+              disabled={isEditMode}
               onClick={() => handleTypeChange("expense")}
               className={`flex-1 rounded-xl py-3.5 text-sm font-medium border transition-all ${
                 operationType === "expense"
@@ -194,6 +205,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
             <div className="flex flex-col sm:flex-row gap-2">
               <button
                 type="button"
+                disabled={isEditMode}
                 onClick={() => handleModeChange("paid")}
                 className={`flex-1 rounded-xl py-2.5 text-sm font-medium border transition-all ${
                   settlementMode === "paid"
@@ -205,6 +217,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
               </button>
               <button
                 type="button"
+                disabled={isEditMode}
                 onClick={() => handleModeChange("partial")}
                 className={`flex-1 rounded-xl py-2.5 text-sm font-medium border transition-all ${
                   settlementMode === "partial"
@@ -216,6 +229,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
               </button>
               <button
                 type="button"
+                disabled={isEditMode}
                 onClick={() => handleModeChange("credit")}
                 className={`flex-1 rounded-xl py-2.5 text-sm font-medium border transition-all ${
                   settlementMode === "credit"
@@ -237,6 +251,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
                 </label>
                 <select
                   value={initialAccountId}
+                  disabled={isEditMode}
                   onChange={(e) => setInitialAccountId(e.target.value)}
                   className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm text-primary-text focus:border-accent appearance-none"
                 >
@@ -255,6 +270,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
                     min="1"
                     max={totalAmount ? parseInt(totalAmount) - 1 : undefined}
                     value={initialPaidAmount}
+                    disabled={isEditMode}
                     onChange={(e) => setInitialPaidAmount(e.target.value)}
                     placeholder="Ex: 20000"
                     className="w-full rounded-xl bg-surface-hover border border-border px-4 py-3 text-sm font-medium text-warning focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
@@ -330,7 +346,7 @@ export default function OperationForm({ categories: initialCategories, accounts,
           disabled={isPending}
           className="w-full rounded-xl bg-accent hover:bg-accent-hover py-4 text-sm font-bold text-primary-text shadow-lg shadow-blue-900/20 transition-all disabled:opacity-50"
         >
-          {isPending ? "Enregistrement..." : "Enregistrer l'opération"}
+          {isPending ? "Enregistrement..." : (isEditMode ? "Modifier l'opération" : "Enregistrer l'opération")}
         </button>
       </form>
 

@@ -1,26 +1,30 @@
-import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
 
-const supabaseUrl = 'https://ocnhzcjkhmhsahwkridt.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9jbmh6Y2praG1oc2Fod2tyaWR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDI3MDcsImV4cCI6MjA5NjE3ODcwN30.5HFhPmGA_CjcIhidKN2O4_sab_yX0cfzB_bKFRR9qpU';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const htmlPath = path.resolve('.stitch/dashboard_raw.html');
+const cssPath = path.resolve('src/app/globals.css');
+const outPath = path.resolve('.stitch/dashboard.html');
 
-async function test() {
-  const { data, error } = await supabase
-    .from("operations")
-    .select(`
-      *,
-      categories ( name ),
-      parties ( name, phone ),
-      accounts!operations_initial_account_id_fkey ( name ),
-      profiles!operations_created_by_fkey ( full_name )
-    `)
-    .limit(1);
+let html = fs.readFileSync(htmlPath, 'utf8');
+const css = fs.readFileSync(cssPath, 'utf8');
 
-  if (error) {
-    console.error("Error:", error);
-  } else {
-    console.log("Success! Rows:", data.length);
-  }
+// Inject Tailwind script and custom CSS into the head
+const headInjection = `
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    ${css}
+  </style>
+`;
+
+if (html.includes('<head>')) {
+  html = html.replace('<head>', `<head>${headInjection}`);
+} else {
+  html = `${headInjection}${html}`;
 }
 
-test();
+// Next.js uses <template> tags for suspense/streaming, which Stitch might not render correctly. We can leave it as is, or clean it up.
+// Let's add a wrapper to simulate dark mode if it relies on data-theme
+html = html.replace('<html', '<html data-theme="dark"');
+
+fs.writeFileSync(outPath, html);
+console.log('Successfully injected CSS into dashboard.html');

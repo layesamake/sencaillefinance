@@ -3,15 +3,18 @@ import type { OperationWithDetails, Account } from "@/types/database";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import PaymentModal from "./PaymentModal";
-import { deletePaymentAction } from "@/app/(connected)/operations/actions";
+import { deletePaymentAction, deleteOperationAction } from "@/app/(connected)/operations/actions";
+import { useRouter } from "next/navigation";
 
 interface OperationDetailsModalProps {
   operation: OperationWithDetails;
   accounts: Account[];
+  currentUserId?: string;
   onClose: () => void;
 }
 
-export default function OperationDetailsModal({ operation, accounts, onClose }: OperationDetailsModalProps) {
+export default function OperationDetailsModal({ operation, accounts, currentUserId, onClose }: OperationDetailsModalProps) {
+  const router = useRouter();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isPending, startTransition] = useTransition();
   const isIncome = operation.operation_type === "income";
@@ -147,6 +150,35 @@ export default function OperationDetailsModal({ operation, accounts, onClose }: 
               <p>Modifiée le : {format(new Date(operation.updated_at), "dd/MM/yyyy à HH:mm", { locale: fr })}</p>
             )}
           </div>
+
+          {currentUserId === operation.created_by && (
+            <div className="flex gap-3 pt-4 border-t border-border">
+              <button
+                disabled={isPending}
+                onClick={() => {
+                  onClose();
+                  router.push(`/operations/${operation.id}/edit`);
+                }}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-border text-primary-text hover:bg-surface-hover transition-colors disabled:opacity-50"
+              >
+                Modifier
+              </button>
+              <button
+                disabled={isPending}
+                onClick={() => {
+                  if (confirm("Voulez-vous vraiment supprimer cette opération et tous ses paiements associés ?")) {
+                    startTransition(async () => {
+                      await deleteOperationAction(operation.id);
+                      onClose();
+                    });
+                  }
+                }}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-danger/30 text-danger bg-danger/10 hover:bg-danger/20 transition-colors disabled:opacity-50"
+              >
+                Supprimer
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

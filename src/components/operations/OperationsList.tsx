@@ -8,9 +8,10 @@ import OperationDetailsModal from "./OperationDetailsModal";
 interface OperationsListProps {
   operations: OperationWithDetails[];
   accounts: Account[];
+  currentUserId?: string;
 }
 
-export default function OperationsList({ operations, accounts }: OperationsListProps) {
+export default function OperationsList({ operations, accounts, currentUserId }: OperationsListProps) {
   const [selectedOp, setSelectedOp] = useState<OperationWithDetails | null>(null);
 
   if (operations.length === 0) {
@@ -40,6 +41,7 @@ export default function OperationsList({ operations, accounts }: OperationsListP
         <OperationDetailsModal 
           operation={selectedOp} 
           accounts={accounts}
+          currentUserId={currentUserId}
           onClose={() => setSelectedOp(null)} 
         />
       )}

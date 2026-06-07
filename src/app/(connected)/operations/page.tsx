@@ -4,6 +4,7 @@ import { getActiveAccounts } from "@/lib/queries/accounts";
 import OperationsList from "@/components/operations/OperationsList";
 import OperationsFilters from "@/components/operations/OperationsFilters";
 import ExportPdfButton from "@/components/operations/ExportPdfButton";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function OperationsPage({
   searchParams,
@@ -19,6 +20,10 @@ export default async function OperationsPage({
     categoryId: params.categoryId || "all",
     paymentStatus: (params.paymentStatus as any) || "all",
   };
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const currentUserId = user?.id;
 
   const [operations, categories, accounts] = await Promise.all([
     getOperations(filters),
@@ -62,7 +67,7 @@ export default async function OperationsPage({
         </div>
       )}
 
-      <OperationsList operations={operations} accounts={accounts} />
+      <OperationsList operations={operations} accounts={accounts} currentUserId={currentUserId} />
     </div>
   );
 }

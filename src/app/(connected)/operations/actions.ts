@@ -278,3 +278,102 @@ export async function submitTransferAction(formData: FormData) {
   
   return { success: true };
 }
+
+export async function deleteOperationAction(operationId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Non connecté" };
+
+  // Vérifier si l'utilisateur est le créateur
+  const { data: op } = await supabase.from("operations").select("created_by").eq("id", operationId).single();
+  if (!op || op.created_by !== user.id) {
+    return { error: "Non autorisé" };
+  }
+
+  // Soft delete de l'opération
+  const { error: opError } = await supabase.from("operations").update({
+    status: "deleted",
+    deleted_by: user.id,
+    deleted_at: new Date().toISOString()
+  }).eq("id", operationId);
+
+  if (opError) {
+    console.error("[deleteOperationAction] Erreur:", opError);
+    return { error: "Erreur lors de la suppression de l'opération." };
+  }
+
+  // Soft delete des paiements associés
+  await supabase.from("payments").update({
+    status: "deleted",
+    deleted_by: user.id,
+    deleted_at: new Date().toISOString()
+  }).eq("operation_id", operationId).eq("status", "active");
+
+  revalidatePath("/");
+  revalidatePath("/operations");
+  revalidatePath("/dashboard");
+  revalidatePath("/credits");
+
+  return { success: true };
+}
+
+export async function updateOperationAction(operationId: string, formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Non connecté" };
+
+  const { data: op } = await supabase.from("operations")
+    .select("created_by, initial_paid_amount, payments(amount, status)")
+    .eq("id", operationId).single();
+
+  if (!op || op.created_by !== user.id) {
+    return { error: "Non autorisé" };
+  }
+
+  const categoryId = formData.get("category_id") as string;
+  const totalAmount = parseFloat(formData.get("total_amount") as string);
+  const partyId = formData.get("party_id") as string;
+  const operationDate = formData.get("operation_date") as string;
+  const description = formData.get("description") as string;
+
+  if (!categoryId || !totalAmount || !operationDate) {
+    return { error: "Veuillez remplir tous les champs obligatoires." };
+  }
+
+  if (totalAmount <= 0) {
+    return { error: "Le montant total doit être supérieur à zéro." };
+  }
+
+  // Vérification de la cohérence avec les paiements existants
+  const sumPayments = op.payments?.filter((p: any) => p.status === 'active').reduce((sum: number, p: any) => sum + p.amount, 0) || 0;
+  const totalDejaPaye = op.initial_paid_amount + sumPayments;
+
+  if (totalAmount < totalDejaPaye) {
+    return { error: `Le nouveau montant total (${totalAmount} F) ne peut pas être inférieur au montant déjà payé (${totalDejaPaye} F).` };
+  }
+
+  const updateData = {
+    category_id: categoryId,
+    total_amount: totalAmount,
+    party_id: partyId || null,
+    operation_date: operationDate,
+    description: description ? description.trim() : null,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabase.from("operations").update(updateData).eq("id", operationId);
+
+  if (error) {
+    console.error("[updateOperationAction] Erreur:", error);
+    return { error: "Erreur lors de la modification de l'opération." };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/operations");
+  revalidatePath("/dashboard");
+  revalidatePath("/credits");
+
+  return { success: true };
+}

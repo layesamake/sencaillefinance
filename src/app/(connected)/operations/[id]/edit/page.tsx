@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import OperationForm from "@/components/operations/OperationForm";
 import { getActiveCategories } from "@/lib/queries/categories";
 import { getActiveAccounts } from "@/lib/queries/accounts";
-import { getParties } from "@/lib/queries/parties";
+import { getActiveParties } from "@/lib/queries/parties";
 
 export default async function EditOperationPage({ params }: { params: { id: string } }) {
   const { id } = await Promise.resolve(params);
@@ -41,7 +41,7 @@ export default async function EditOperationPage({ params }: { params: { id: stri
   const [categories, accounts, parties] = await Promise.all([
     getActiveCategories(),
     getActiveAccounts(),
-    getParties()
+    getActiveParties()
   ]);
 
   return (

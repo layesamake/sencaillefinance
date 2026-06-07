@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Wallet, ChevronRight, Users } from "lucide-react";
 import LogoutButton from "@/components/settings/LogoutButton";
+import ResetDataButton from "@/components/settings/ResetDataButton";
 
 export default function SettingsPage() {
   return (
@@ -42,6 +43,14 @@ export default function SettingsPage() {
         </Link>
 
         <LogoutButton />
+      </div>
+
+      <div className="pt-8 mt-8 border-t border-border">
+        <div className="mb-4">
+          <h2 className="text-lg font-bold text-danger">Zone de danger</h2>
+          <p className="text-sm text-muted">Actions irréversibles pour votre compte</p>
+        </div>
+        <ResetDataButton />
       </div>
     </div>
   );

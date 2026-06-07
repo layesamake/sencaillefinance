@@ -10,6 +10,7 @@ export interface OperationsFilters {
   partyId?: string;
   dateStart?: string;
   dateEnd?: string;
+  search?: string;
 }
 
 export async function getOperations(filters?: OperationsFilters): Promise<OperationWithDetails[]> {
@@ -96,6 +97,17 @@ export async function getOperations(filters?: OperationsFilters): Promise<Operat
       if (filters.paymentStatus === "partial") return !isPaid && !isUnpaid;
       if (filters.paymentStatus === "pending") return !isPaid;
       return true;
+    });
+  }
+
+  // Filtrage par recherche textuelle
+  if (filters?.search) {
+    const searchLower = filters.search.toLowerCase();
+    results = results.filter(op => {
+      const inDescription = op.description?.toLowerCase().includes(searchLower);
+      const inCategory = op.categories?.name?.toLowerCase().includes(searchLower);
+      const inParty = op.parties?.name?.toLowerCase().includes(searchLower);
+      return inDescription || inCategory || inParty;
     });
   }
 

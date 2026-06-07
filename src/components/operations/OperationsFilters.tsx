@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Category } from "@/types/database";
 
@@ -19,6 +19,18 @@ export default function OperationsFilters({ categories }: OperationsFiltersProps
   const currentCategoryId = searchParams.get("categoryId") || "all";
   const currentSettlementMode = searchParams.get("settlementMode") || "all";
   const currentPaymentStatus = searchParams.get("paymentStatus") || "all";
+  const currentSearchParam = searchParams.get("search") || "";
+
+  const [searchTerm, setSearchTerm] = useState(currentSearchParam);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm !== currentSearchParam) {
+        updateFilter("search", searchTerm);
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm, currentSearchParam]);
 
   // Catégories filtrées selon le type sélectionné
   const filteredCategories = categories.filter(c => 
@@ -45,11 +57,27 @@ export default function OperationsFilters({ categories }: OperationsFiltersProps
   };
 
   const clearFilters = () => {
+    setSearchTerm("");
     router.push(`/operations`);
   };
 
   return (
     <>
+      <div className="mb-3 relative w-full">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted">
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input
+          type="search"
+          placeholder="Rechercher (mot-clé, catégorie, tiers)..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full bg-surface border border-border rounded-2xl pl-10 pr-4 py-3 text-sm text-primary-text focus:border-accent outline-none transition-colors"
+        />
+      </div>
+
       <div className="flex justify-between items-center bg-surface p-4 rounded-2xl border border-border">
         <div className="text-sm font-medium text-primary-text">
           Filtre: <span className="text-primary-text">{currentPeriod === 'this_month' ? 'Ce mois-ci' : currentPeriod === 'today' ? "Aujourd'hui" : currentPeriod === 'all' ? 'Toutes les dates' : currentPeriod}</span>

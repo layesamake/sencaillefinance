@@ -19,6 +19,7 @@ export default async function OperationsPage({
     type: (params.type as any) || "all",
     categoryId: params.categoryId || "all",
     paymentStatus: (params.paymentStatus as any) || "all",
+    search: params.search,
   };
 
   const supabase = await createClient();

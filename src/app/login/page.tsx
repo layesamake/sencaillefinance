@@ -33,7 +33,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-[80vh] flex-col items-center justify-center p-4">
       <div className="w-full max-w-sm rounded-xl bg-surface p-8 shadow-sm border border-border">
-        <h1 className="mb-6 text-2xl font-bold text-center text-primary-text">Connexion</h1>
+        <h1 className="mb-6 text-2xl font-bold text-center text-primary-text">SENCAILLE FINANCE</h1>
         
         {error && (
           <div className="mb-4 rounded-lg bg-red-950/50 p-3 text-sm text-danger border border-red-900/50">

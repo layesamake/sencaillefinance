@@ -33,7 +33,7 @@ export default function TopBar({ role, fullName }: TopBarProps) {
     <>
       <header className="fixed top-0 left-0 right-0 max-w-md mx-auto bg-background border-b border-border h-16 z-50 px-4 flex items-center justify-between transition-colors duration-300">
         <Link href="/dashboard" className="text-xl font-bold text-primary-text tracking-tight">
-          SENCAILLE
+          SENCAILLE FINANCE
         </Link>
         <div className="flex items-center space-x-2">
           <ThemeToggle />

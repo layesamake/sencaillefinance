@@ -3,7 +3,7 @@ import { getActiveCategories } from "@/lib/queries/categories";
 import { getActiveAccounts } from "@/lib/queries/accounts";
 import OperationsList from "@/components/operations/OperationsList";
 import OperationsFilters from "@/components/operations/OperationsFilters";
-import ExportPdfButton from "@/components/operations/ExportPdfButton";
+import ExportButton from "@/components/operations/ExportButton";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function OperationsPage({
@@ -49,7 +49,7 @@ export default async function OperationsPage({
             {operations.length} opération(s) trouvée(s)
           </p>
         </div>
-        <ExportPdfButton operations={operations} />
+        <ExportButton operations={operations} />
       </div>
 
       <OperationsFilters categories={categories} />

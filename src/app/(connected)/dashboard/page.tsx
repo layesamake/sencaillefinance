@@ -77,6 +77,43 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      {/* Overdue Widgets */}
+      {(stats.overdueReceivablesList.length > 0 || stats.overdueDebtsList.length > 0) && (
+        <div className="space-y-3">
+          {stats.overdueReceivablesList.length > 0 && (
+            <Link href="/credits" className="block bg-danger/10 border border-danger/30 rounded-2xl p-4 flex justify-between items-center hover:bg-danger/20 transition-colors">
+              <div>
+                <h3 className="text-danger font-bold flex items-center gap-2">
+                  <span className="text-lg">🚨</span> À relancer
+                </h3>
+                <p className="text-sm text-danger/90 mt-1 font-medium">
+                  {stats.overdueReceivablesList.length} créance(s) de plus de 15 jours
+                </p>
+              </div>
+              <div className="bg-danger/20 p-2 rounded-full">
+                <ArrowUpRight className="text-danger" size={20} />
+              </div>
+            </Link>
+          )}
+
+          {stats.overdueDebtsList.length > 0 && (
+            <Link href="/credits" className="block bg-warning/10 border border-warning/30 rounded-2xl p-4 flex justify-between items-center hover:bg-warning/20 transition-colors">
+              <div>
+                <h3 className="text-warning font-bold flex items-center gap-2">
+                  <span className="text-lg">⚠️</span> À payer urgemment
+                </h3>
+                <p className="text-sm text-warning/90 mt-1 font-medium">
+                  {stats.overdueDebtsList.length} dette(s) de plus de 15 jours
+                </p>
+              </div>
+              <div className="bg-warning/20 p-2 rounded-full">
+                <ArrowUpRight className="text-warning" size={20} />
+              </div>
+            </Link>
+          )}
+        </div>
+      )}
+
       {/* Monthly Performance */}
       <div className="bg-surface border border-border rounded-3xl p-5 space-y-4">
         <div className="flex items-center space-x-2 mb-2">

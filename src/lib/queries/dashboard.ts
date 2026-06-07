@@ -1,5 +1,6 @@
 import { getActiveAccounts } from "./accounts";
 import { getOperations } from "./operations";
+import { differenceInDays } from "date-fns";
 
 export async function getDashboardStats() {
   const [accounts, operations] = await Promise.all([
@@ -17,6 +18,9 @@ export async function getDashboardStats() {
   let thisMonthIncome = 0;
   let thisMonthExpense = 0;
 
+  const overdueReceivablesList: typeof operations = [];
+  const overdueDebtsList: typeof operations = [];
+
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
@@ -29,10 +33,12 @@ export async function getDashboardStats() {
 
     const opDate = new Date(op.operation_date);
     const isThisMonth = opDate.getMonth() === currentMonth && opDate.getFullYear() === currentYear;
+    const isOverdue = remaining > 0 && differenceInDays(now, opDate) > 15;
 
     if (op.operation_type === "income") {
       totalBalance += totalPaid;
       if (remaining > 0) totalReceivables += remaining;
+      if (isOverdue) overdueReceivablesList.push(op);
       if (isThisMonth) thisMonthIncome += op.total_amount;
       
       if (op.initial_account_id && op.initial_paid_amount > 0) {
@@ -48,6 +54,7 @@ export async function getDashboardStats() {
     } else {
       totalBalance -= totalPaid;
       if (remaining > 0) totalDebts += remaining;
+      if (isOverdue) overdueDebtsList.push(op);
       if (isThisMonth) thisMonthExpense += op.total_amount;
 
       if (op.initial_account_id && op.initial_paid_amount > 0) {
@@ -71,6 +78,8 @@ export async function getDashboardStats() {
     totalDebts,
     thisMonthIncome,
     thisMonthExpense,
+    overdueReceivablesList,
+    overdueDebtsList,
     recentOperations: operations.slice(0, 5),
     accountBalances
   };

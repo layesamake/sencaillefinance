@@ -1,5 +1,5 @@
 import type { OperationWithDetails } from "@/types/database";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { fr } from "date-fns/locale";
 
 interface OperationCardProps {
@@ -14,6 +14,7 @@ export default function OperationCard({ operation, onClick }: OperationCardProps
 
   const sumPayments = operation.payments?.filter(p => p.status === 'active').reduce((sum, p) => sum + p.amount, 0) || 0;
   const restant = operation.total_amount - operation.initial_paid_amount - sumPayments;
+  const isOverdue = restant > 0 && differenceInDays(new Date(), new Date(operation.operation_date)) > 15;
   
   const statusLabels: Record<string, string> = {
     paid: "Payé",
@@ -24,7 +25,11 @@ export default function OperationCard({ operation, onClick }: OperationCardProps
   return (
     <div 
       onClick={onClick}
-      className="bg-surface border border-border rounded-2xl p-4 cursor-pointer hover:border-border transition-colors active:scale-[0.98]"
+      className={`bg-surface border rounded-2xl p-4 cursor-pointer transition-colors active:scale-[0.98] ${
+        isOverdue 
+          ? "border-danger/60 shadow-[0_0_15px_-3px_rgba(239,68,68,0.15)] hover:border-danger" 
+          : "border-border hover:border-border"
+      }`}
     >
       <div className="flex justify-between items-start mb-3">
         <div>
@@ -58,7 +63,8 @@ export default function OperationCard({ operation, onClick }: OperationCardProps
           )}
           
           {restant > 0 && (
-            <span className="text-warning font-medium ml-auto">
+            <span className={`font-bold ml-auto flex items-center gap-1.5 ${isOverdue ? "text-danger" : "text-warning"}`}>
+              {isOverdue && <span className="text-[10px] uppercase tracking-wider bg-danger text-white px-1.5 py-0.5 rounded mr-1">En retard</span>}
               Reste: {restant.toLocaleString("fr-FR")} F
             </span>
           )}

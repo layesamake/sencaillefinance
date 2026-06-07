@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Menu, X, User, LogOut, Settings, Users, Grid } from "lucide-react";
+import { Menu, X, User, LogOut, Settings, Users, Grid, Landmark } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import ThemeToggle from "@/components/layout/ThemeToggle";
 
@@ -32,8 +32,9 @@ export default function TopBar({ role, fullName }: TopBarProps) {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 max-w-md mx-auto bg-background border-b border-border h-16 z-50 px-4 flex items-center justify-between transition-colors duration-300">
-        <Link href="/dashboard" className="text-xl font-bold text-primary-text tracking-tight">
-          SENCAILLE FINANCE
+        <Link href="/dashboard" className="flex items-center space-x-2 text-xl font-bold text-primary-text tracking-tight">
+          <Landmark size={24} className="text-accent" />
+          <span>SENCAILLE FINANCE</span>
         </Link>
         <div className="flex items-center space-x-2">
           <ThemeToggle />

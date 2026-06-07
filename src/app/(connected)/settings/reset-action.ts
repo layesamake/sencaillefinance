@@ -12,22 +12,34 @@ export async function resetAllOperationsAction() {
   }
 
   try {
-    // 1. Hard delete des paiements de l'utilisateur
+    const now = new Date().toISOString();
+
+    // 1. Soft delete des paiements de l'utilisateur
     const { error: paymentsError } = await supabase
       .from("payments")
-      .delete()
-      .eq("created_by", user.id);
+      .update({
+        status: "deleted",
+        deleted_by: user.id,
+        deleted_at: now
+      })
+      .eq("created_by", user.id)
+      .eq("status", "active");
 
     if (paymentsError) {
       console.error("[resetAllOperationsAction] Erreur suppression paiements:", paymentsError);
       return { error: "Erreur lors de la suppression des paiements." };
     }
 
-    // 2. Hard delete des opérations de l'utilisateur
+    // 2. Soft delete des opérations de l'utilisateur
     const { error: operationsError } = await supabase
       .from("operations")
-      .delete()
-      .eq("created_by", user.id);
+      .update({
+        status: "deleted",
+        deleted_by: user.id,
+        deleted_at: now
+      })
+      .eq("created_by", user.id)
+      .eq("status", "active");
 
     if (operationsError) {
       console.error("[resetAllOperationsAction] Erreur suppression opérations:", operationsError);

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-export async function POST() {
+export async function GET() {
   console.log("--> API /api/fix-profile déclenchée !");
   
   try {
@@ -13,8 +13,8 @@ export async function POST() {
       return NextResponse.json({ error: "Utilisateur non connecté" }, { status: 401 });
     }
 
-    console.log("--> API: Tentative d'insertion du profil pour user:", user.id);
-    const { error } = await supabase.from("profiles").insert({
+    console.log("--> API: Tentative d'upsert du profil pour user:", user.id);
+    const { error } = await supabase.from("profiles").upsert({
       id: user.id,
       role: "admin",
       status: "active",

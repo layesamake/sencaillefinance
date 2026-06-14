@@ -62,13 +62,64 @@
   --border: #2c392c;
   --primary-text: #f0fdf4;
   --muted: #86efac;
-  --accent: #eab308;
-  --accent-hover: #ca8a04;
-  --accent-foreground: #141b14;
+  --accent: #10b981; /* Emerald 500 */
+  --accent-hover: #059669; /* Emerald 600 */
+  --accent-foreground: #ffffff;
 
   --danger: #ef4444;
   --success: #22c55e;
   --warning: #f59e0b;
+}
+
+/* Ocean Blue */
+[data-theme="ocean"] {
+  --background: #083344; /* Cyan 950 */
+  --surface: #164e63; /* Cyan 900 */
+  --surface-hover: #155e75; /* Cyan 800 */
+  --border: #155e75;
+  --primary-text: #ecfeff; /* Cyan 50 */
+  --muted: #67e8f9; /* Cyan 300 */
+  --accent: #06b6d4; /* Cyan 500 */
+  --accent-hover: #0891b2; /* Cyan 600 */
+  --accent-foreground: #ffffff;
+
+  --danger: #f43f5e;
+  --success: #10b981;
+  --warning: #f59e0b;
+}
+
+/* Royal Purple */
+[data-theme="royal"] {
+  --background: #2e1065; /* Violet 950 */
+  --surface: #4c1d95; /* Violet 900 */
+  --surface-hover: #5b21b6; /* Violet 800 */
+  --border: #5b21b6;
+  --primary-text: #f5f3ff; /* Violet 50 */
+  --muted: #c4b5fd; /* Violet 300 */
+  --accent: #8b5cf6; /* Violet 500 */
+  --accent-hover: #7c3aed; /* Violet 600 */
+  --accent-foreground: #ffffff;
+
+  --danger: #ef4444;
+  --success: #10b981;
+  --warning: #f59e0b;
+}
+
+/* Sunset Orange */
+[data-theme="sunset"] {
+  --background: #451a03; /* Orange 950 */
+  --surface: #78350f; /* Orange 900 */
+  --surface-hover: #92400e; /* Orange 800 */
+  --border: #92400e;
+  --primary-text: #fffbeb; /* Orange 50 */
+  --muted: #fcd34d; /* Orange 300 */
+  --accent: #f97316; /* Orange 500 */
+  --accent-hover: #ea580c; /* Orange 600 */
+  --accent-foreground: #ffffff;
+
+  --danger: #ef4444;
+  --success: #10b981;
+  --warning: #eab308;
 }
 
 body {

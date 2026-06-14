@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import type { Account } from "@/types/database";
 import { submitPaymentAction } from "@/app/(connected)/operations/actions";
+import confetti from "canvas-confetti";
 
 interface PaymentModalProps {
   operationId: string;
@@ -37,6 +38,14 @@ export default function PaymentModal({ operationId, restant, accounts, onClose, 
       if (result?.error) {
         setError(result.error);
       } else {
+        if (parseFloat(amount) === restant) {
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#3b82f6', '#10b981', '#f59e0b']
+          });
+        }
         onSuccess();
       }
     });

@@ -61,6 +61,16 @@ export default function OperationsFilters({ categories }: OperationsFiltersProps
     router.push(`/operations`);
   };
 
+  const isFilterActive = (key: string, value: string) => searchParams.get(key) === value;
+
+  const toggleFilter = (key: string, value: string) => {
+    if (isFilterActive(key, value)) {
+      updateFilter(key, "all");
+    } else {
+      updateFilter(key, value);
+    }
+  };
+
   return (
     <>
       <div className="mb-3 relative w-full">
@@ -76,6 +86,50 @@ export default function OperationsFilters({ categories }: OperationsFiltersProps
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full bg-surface border border-border rounded-2xl pl-10 pr-4 py-3 text-sm text-primary-text focus:border-accent outline-none transition-colors"
         />
+      </div>
+
+      {/* Quick Filter Chips */}
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-1 no-scrollbar">
+        <button
+          onClick={() => toggleFilter("period", "today")}
+          className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
+            isFilterActive("period", "today")
+              ? "bg-accent/20 border-accent text-accent"
+              : "bg-surface border-border text-muted hover:border-gray-600"
+          }`}
+        >
+          📅 Aujourd'hui
+        </button>
+        <button
+          onClick={() => toggleFilter("paymentStatus", "pending")}
+          className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
+            isFilterActive("paymentStatus", "pending")
+              ? "bg-warning/20 border-warning text-warning"
+              : "bg-surface border-border text-muted hover:border-gray-600"
+          }`}
+        >
+          ⚠️ Impayés
+        </button>
+        <button
+          onClick={() => toggleFilter("type", "income")}
+          className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
+            isFilterActive("type", "income")
+              ? "bg-success/20 border-success text-success"
+              : "bg-surface border-border text-muted hover:border-gray-600"
+          }`}
+        >
+          📈 Recettes
+        </button>
+        <button
+          onClick={() => toggleFilter("type", "expense")}
+          className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
+            isFilterActive("type", "expense")
+              ? "bg-danger/20 border-danger text-danger"
+              : "bg-surface border-border text-muted hover:border-gray-600"
+          }`}
+        >
+          📉 Dépenses
+        </button>
       </div>
 
       <div className="flex justify-between items-center bg-surface p-4 rounded-2xl border border-border">

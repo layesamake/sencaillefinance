@@ -2,17 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, PlusCircle, History, CreditCard, BarChart2 } from "lucide-react";
+import { Home, History, CreditCard, BarChart2, Settings } from "lucide-react";
 
 export default function BottomNav() {
   const pathname = usePathname();
 
   const navItems = [
     { name: "Accueil", href: "/dashboard", icon: Home },
-    { name: "Saisir", href: "/operations/new", icon: PlusCircle },
     { name: "Historique", href: "/operations", icon: History },
     { name: "Crédits", href: "/credits", icon: CreditCard },
     { name: "Rapports", href: "/reports", icon: BarChart2 },
+    { name: "Paramètres", href: "/settings", icon: Settings },
   ];
 
   return (

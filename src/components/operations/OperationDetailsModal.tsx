@@ -5,6 +5,10 @@ import { fr } from "date-fns/locale";
 import PaymentModal from "./PaymentModal";
 import { deletePaymentAction, deleteOperationAction } from "@/app/(connected)/operations/actions";
 import { useRouter } from "next/navigation";
+import { Pencil, Trash2, X, Share2, Loader2 } from "lucide-react";
+import ReceiptGenerator from "./ReceiptGenerator";
+import * as htmlToImage from "html-to-image";
+import { useRef } from "react";
 
 interface OperationDetailsModalProps {
   operation: OperationWithDetails;
@@ -17,6 +21,8 @@ export default function OperationDetailsModal({ operation, accounts, currentUser
   const router = useRouter();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const receiptRef = useRef<HTMLDivElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const isIncome = operation.operation_type === "income";
   const amountColor = isIncome ? "text-success" : "text-danger";
   
@@ -30,20 +36,89 @@ export default function OperationDetailsModal({ operation, accounts, currentUser
     partial: "Paiement partiel"
   };
 
+  const handleShareReceipt = async () => {
+    if (!receiptRef.current || isGenerating) return;
+    
+    try {
+      setIsGenerating(true);
+      
+      const blob = await htmlToImage.toBlob(receiptRef.current, { 
+        pixelRatio: 2, 
+        backgroundColor: '#ffffff'
+      });
+      
+      if (!blob) throw new Error("Failed to generate receipt blob");
+      
+      const file = new File([blob], `Recu_Sencaille_${format(new Date(operation.operation_date), "ddMMyyyy")}.png`, { type: "image/png" });
+      
+      // Try native share (WhatsApp, etc)
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'Reçu de paiement Sencaille',
+          text: `Voici le reçu concernant l'opération du ${format(new Date(operation.operation_date), "dd/MM/yyyy")}.`,
+          files: [file]
+        });
+      } else {
+        // Fallback download for desktop
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    } catch (error: any) {
+      console.error("Error generating receipt:", error);
+      alert("Une erreur est survenue lors de la génération du reçu : " + error.message);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-md bg-surface border border-border rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="text-lg font-bold text-primary-text">Détails de l'opération</h2>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-surface-hover text-muted hover:text-primary-text transition-colors"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              disabled={isPending}
+              onClick={() => {
+                onClose();
+                router.push(`/operations/${operation.id}/edit`);
+              }}
+              className="p-2 rounded-full hover:bg-accent/10 text-muted hover:text-accent transition-colors"
+              title="Modifier"
+            >
+              <Pencil size={20} />
+            </button>
+            <button
+              disabled={isPending}
+              onClick={() => {
+                if (confirm("Voulez-vous vraiment supprimer cette opération et tous ses paiements associés ?")) {
+                  startTransition(async () => {
+                    await deleteOperationAction(operation.id);
+                    onClose();
+                  });
+                }
+              }}
+              className="p-2 rounded-full hover:bg-danger/10 text-muted hover:text-danger transition-colors"
+              title="Supprimer"
+            >
+              <Trash2 size={20} />
+            </button>
+            <div className="w-px h-6 bg-border mx-1" />
+            <button
+              onClick={onClose}
+              className="p-2 rounded-full hover:bg-surface-hover text-muted hover:text-primary-text transition-colors"
+              title="Fermer"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
@@ -151,34 +226,25 @@ export default function OperationDetailsModal({ operation, accounts, currentUser
             )}
           </div>
 
-          {currentUserId === operation.created_by && (
-            <div className="flex gap-3 pt-4 border-t border-border">
-              <button
-                disabled={isPending}
-                onClick={() => {
-                  onClose();
-                  router.push(`/operations/${operation.id}/edit`);
-                }}
-                className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-border text-primary-text hover:bg-surface-hover transition-colors disabled:opacity-50"
-              >
-                Modifier
-              </button>
-              <button
-                disabled={isPending}
-                onClick={() => {
-                  if (confirm("Voulez-vous vraiment supprimer cette opération et tous ses paiements associés ?")) {
-                    startTransition(async () => {
-                      await deleteOperationAction(operation.id);
-                      onClose();
-                    });
-                  }
-                }}
-                className="flex-1 py-2.5 rounded-xl text-sm font-semibold border border-danger/30 text-danger bg-danger/10 hover:bg-danger/20 transition-colors disabled:opacity-50"
-              >
-                Supprimer
-              </button>
-            </div>
-          )}
+          <div className="pt-4 border-t border-border">
+            <button
+              onClick={handleShareReceipt}
+              disabled={isGenerating}
+              className="w-full py-3 bg-emerald-600/10 text-emerald-600 hover:bg-emerald-600/20 border border-emerald-600/20 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Génération en cours...
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-5 h-5" />
+                  Partager le reçu (WhatsApp)
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -194,6 +260,9 @@ export default function OperationDetailsModal({ operation, accounts, currentUser
           }}
         />
       )}
+
+      {/* Hidden Receipt component for generation */}
+      <ReceiptGenerator operation={operation} receiptRef={receiptRef} />
     </div>
   );
 }

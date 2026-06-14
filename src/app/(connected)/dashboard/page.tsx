@@ -3,8 +3,14 @@ import { getActiveAccounts } from "@/lib/queries/accounts";
 import OperationsList from "@/components/operations/OperationsList";
 import Link from "next/link";
 import { ArrowUpRight, ArrowDownRight, Wallet, Activity } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import PerformanceChart from "@/components/dashboard/PerformanceChart";
 
 export default async function DashboardPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const currentUserId = user?.id;
+
   const [stats, accounts] = await Promise.all([
     getDashboardStats(),
     getActiveAccounts()
@@ -142,6 +148,9 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* The new interactive chart */}
+        <PerformanceChart data={stats.chartData} />
       </div>
 
       {/* Recent Operations */}
@@ -154,7 +163,7 @@ export default async function DashboardPage() {
         </div>
         
         {stats.recentOperations.length > 0 ? (
-          <OperationsList operations={stats.recentOperations} accounts={accounts} />
+          <OperationsList operations={stats.recentOperations} accounts={accounts} currentUserId={currentUserId} />
         ) : (
           <div className="text-center py-10 bg-surface border border-border rounded-3xl">
             <p className="text-muted">Aucune opération récente.</p>

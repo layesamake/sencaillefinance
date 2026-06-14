@@ -7,6 +7,7 @@ import type { Party } from "@/types/database";
 import PartyCard from "./PartyCard";
 import EditPartyModal from "./EditPartyModal";
 import QuickPartyModal from "./QuickPartyModal";
+import EmptyState from "@/components/ui/EmptyState";
 
 export default function PartiesList({ parties, userRole }: { parties: Party[], userRole?: string }) {
   const router = useRouter();
@@ -52,9 +53,15 @@ export default function PartiesList({ parties, userRole }: { parties: Party[], u
 
       <div className="space-y-3">
         {filteredParties.length === 0 ? (
-          <div className="text-center py-10 bg-surface border border-border rounded-3xl">
-            <p className="text-muted">Aucun résultat trouvé.</p>
-          </div>
+          <EmptyState
+            title="Aucun contact trouvé"
+            description="La liste est vide ou aucun résultat ne correspond à votre recherche."
+            icon={
+              <svg className="w-10 h-10 text-accent/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            }
+          />
         ) : (
           filteredParties.map(party => (
             <PartyCard 

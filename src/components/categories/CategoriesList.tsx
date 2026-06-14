@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import type { Category, OperationType } from "@/types/database";
 import { toggleCategoryStatusAction } from "@/app/(connected)/categories/actions";
 import CategoryForm from "./CategoryForm";
+import EmptyState from "@/components/ui/EmptyState";
 
 interface CategoriesListProps {
   categories: Category[];
@@ -75,9 +76,23 @@ export default function CategoriesList({ categories, isAdmin }: CategoriesListPr
       {/* Liste */}
       <div className="space-y-2">
         {filtered.length === 0 ? (
-          <div className="rounded-xl bg-surface p-8 text-center border border-border">
-            <p className="text-muted">Aucune catégorie trouvée.</p>
-          </div>
+          <EmptyState
+            title="Catégorie introuvable"
+            description={`Vous n'avez pas encore créé de catégories pour les ${activeTab === 'income' ? 'recettes' : 'dépenses'}.`}
+            icon={
+              <svg className="w-10 h-10 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+            }
+            action={isAdmin ? (
+              <button
+                onClick={() => { setEditCategory(null); setShowForm(true); }}
+                className="px-6 py-3 mt-2 rounded-xl bg-accent text-primary-text font-medium hover:bg-accent-hover transition-colors"
+              >
+                Créer la première
+              </button>
+            ) : undefined}
+          />
         ) : (
           filtered.map((cat) => (
             <div

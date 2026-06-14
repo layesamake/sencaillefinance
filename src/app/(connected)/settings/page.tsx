@@ -1,15 +1,22 @@
 import Link from "next/link";
-import { Wallet, ChevronRight, Users } from "lucide-react";
+import { Wallet, ChevronRight, Users, Tags, DownloadCloud } from "lucide-react";
 import LogoutButton from "@/components/settings/LogoutButton";
 import ResetDataButton from "@/components/settings/ResetDataButton";
+import ExportButton from "@/components/operations/ExportButton";
+import ThemeSelector from "@/components/settings/ThemeSelector";
+import { getOperations } from "@/lib/queries/operations";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const operations = await getOperations({ period: "all", type: "all", categoryId: "all", paymentStatus: "all" });
+
   return (
     <div className="p-4 max-w-2xl mx-auto space-y-6 pb-24">
       <div>
         <h1 className="text-2xl font-bold text-primary-text">Paramètres</h1>
         <p className="text-sm text-muted mt-1">Configuration de l'application</p>
       </div>
+
+      <ThemeSelector />
 
       <div className="space-y-3">
         <Link href="/settings/accounts" className="block">
@@ -21,6 +28,21 @@ export default function SettingsPage() {
               <div>
                 <h3 className="font-bold text-primary-text">Comptes financiers</h3>
                 <p className="text-sm text-muted">Ajouter ou modifier vos caisses et banques</p>
+              </div>
+            </div>
+            <ChevronRight className="text-gray-600" />
+          </div>
+        </Link>
+
+        <Link href="/categories" className="block">
+          <div className="bg-surface border border-border p-4 rounded-2xl flex items-center justify-between hover:bg-surface-hover/80 transition-all">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-purple-500/10 text-purple-400 rounded-xl">
+                <Tags size={24} />
+              </div>
+              <div>
+                <h3 className="font-bold text-primary-text">Gestion des catégories</h3>
+                <p className="text-sm text-muted">Créer, modifier ou désactiver des catégories</p>
               </div>
             </div>
             <ChevronRight className="text-gray-600" />
@@ -43,6 +65,16 @@ export default function SettingsPage() {
         </Link>
 
         <LogoutButton />
+      </div>
+
+      <div className="pt-8 mt-8 border-t border-border">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-primary-text">Sauvegarde des données</h2>
+            <p className="text-sm text-muted">Téléchargez l'intégralité de vos opérations</p>
+          </div>
+          <ExportButton operations={operations} />
+        </div>
       </div>
 
       <div className="pt-8 mt-8 border-t border-border">

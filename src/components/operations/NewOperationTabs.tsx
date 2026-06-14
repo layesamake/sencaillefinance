@@ -10,9 +10,10 @@ interface NewOperationTabsProps {
   accounts: Account[];
   parties: Party[];
   defaultTab?: "operation" | "transfer";
+  defaultType?: "income" | "expense";
 }
 
-export default function NewOperationTabs({ categories, accounts, parties, defaultTab = "operation" }: NewOperationTabsProps) {
+export default function NewOperationTabs({ categories, accounts, parties, defaultTab = "operation", defaultType = "income" }: NewOperationTabsProps) {
   const [activeTab, setActiveTab] = useState<"operation" | "transfer">(defaultTab);
 
   return (
@@ -37,7 +38,7 @@ export default function NewOperationTabs({ categories, accounts, parties, defaul
       </div>
 
       {activeTab === "operation" ? (
-        <OperationForm categories={categories} accounts={accounts} parties={parties} />
+        <OperationForm categories={categories} accounts={accounts} parties={parties} initialType={defaultType} />
       ) : (
         <TransferForm accounts={accounts} />
       )}

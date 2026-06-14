@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
+import { useState, useTransition, useMemo, useEffect } from "react";
 import type { Category, Account, Party, OperationType, SettlementMode } from "@/types/database";
 import { submitOperationAction, updateOperationAction } from "@/app/(connected)/operations/actions";
 import QuickCategoryModal from "@/components/categories/QuickCategoryModal";
@@ -11,15 +11,16 @@ interface OperationFormProps {
   accounts: Account[];
   parties: Party[];
   initialData?: any; // Contains existing operation data
+  initialType?: OperationType;
 }
 
-export default function OperationForm({ categories: initialCategories, accounts, parties: initialParties, initialData }: OperationFormProps) {
+export default function OperationForm({ categories: initialCategories, accounts, parties: initialParties, initialData, initialType = "income" }: OperationFormProps) {
   // State from props that can be extended via quick creation
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [parties, setParties] = useState<Party[]>(initialParties);
 
   // Form State
-  const [operationType, setOperationType] = useState<OperationType>(initialData?.operation_type || "income");
+  const [operationType, setOperationType] = useState<OperationType>(initialData?.operation_type || initialType);
   const [categoryId, setCategoryId] = useState<string>(initialData?.category_id || "");
   const [totalAmount, setTotalAmount] = useState<string>(initialData?.total_amount ? String(initialData.total_amount) : "");
   const [settlementMode, setSettlementMode] = useState<SettlementMode>(initialData?.settlement_mode || "paid");
@@ -38,6 +39,31 @@ export default function OperationForm({ categories: initialCategories, accounts,
   // Status
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // Smart Defaults (Hydration safe)
+  useEffect(() => {
+    if (!isEditMode) {
+      const lastAccountId = localStorage.getItem("compta_lastAccountId");
+      const lastSettlementMode = localStorage.getItem("compta_lastSettlementMode") as SettlementMode;
+      
+      if (lastAccountId && !initialData?.initial_account_id) setInitialAccountId(lastAccountId);
+      if (lastSettlementMode && !initialData?.settlement_mode) setSettlementMode(lastSettlementMode);
+    }
+  }, [isEditMode, initialData]);
+
+  useEffect(() => {
+    if (!isEditMode && categoryId) {
+      try {
+        const stored = localStorage.getItem("compta_lastPartyForCategory");
+        if (stored) {
+          const map = JSON.parse(stored);
+          if (map[categoryId] && !partyId) {
+            setPartyId(map[categoryId]);
+          }
+        }
+      } catch (e) {}
+    }
+  }, [categoryId, isEditMode]);
 
   // Computed
   const filteredCategories = useMemo(() => {
@@ -109,6 +135,18 @@ export default function OperationForm({ categories: initialCategories, accounts,
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         if (!isEditMode) {
+          // Smart Defaults saving
+          if (initialAccountId) localStorage.setItem("compta_lastAccountId", initialAccountId);
+          if (settlementMode) localStorage.setItem("compta_lastSettlementMode", settlementMode);
+          if (categoryId && partyId) {
+            try {
+              const stored = localStorage.getItem("compta_lastPartyForCategory");
+              const map = stored ? JSON.parse(stored) : {};
+              map[categoryId] = partyId;
+              localStorage.setItem("compta_lastPartyForCategory", JSON.stringify(map));
+            } catch (e) {}
+          }
+
           setTotalAmount("");
           setInitialPaidAmount("");
           setDescription("");

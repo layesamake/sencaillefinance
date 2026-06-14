@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/layout/BottomNav";
 import TopBar from "@/components/layout/TopBar";
+import SmartFAB from "@/components/layout/SmartFAB";
 
 export default async function ConnectedLayout({
   children,
@@ -76,6 +77,7 @@ export default async function ConnectedLayout({
         <main className="flex-1 pt-16 pb-16 min-h-screen bg-background text-primary-text">
           {children}
         </main>
+        <SmartFAB />
         <BottomNav />
       </>
     );
@@ -105,6 +107,7 @@ export default async function ConnectedLayout({
       <main className="flex-1 pt-16 pb-16 min-h-screen bg-background text-primary-text transition-colors duration-300">
         {children}
       </main>
+      <SmartFAB />
       <BottomNav />
     </>
   );

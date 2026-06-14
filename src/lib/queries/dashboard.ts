@@ -1,6 +1,7 @@
 import { getActiveAccounts } from "./accounts";
 import { getOperations } from "./operations";
-import { differenceInDays } from "date-fns";
+import { differenceInDays, format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 export async function getDashboardStats() {
   const [accounts, operations] = await Promise.all([
@@ -25,6 +26,19 @@ export async function getDashboardStats() {
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
+  const chartData: { date: string; timestamp: number; income: number; expense: number }[] = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    d.setHours(0, 0, 0, 0);
+    chartData.push({
+      date: format(d, "dd MMM", { locale: fr }),
+      timestamp: d.getTime(),
+      income: 0,
+      expense: 0
+    });
+  }
+
   operations.forEach(op => {
     const activePayments = op.payments?.filter(p => p.status === 'active') || [];
     const sumPayments = activePayments.reduce((sum, p) => sum + p.amount, 0);
@@ -32,14 +46,20 @@ export async function getDashboardStats() {
     const remaining = op.total_amount - totalPaid;
 
     const opDate = new Date(op.operation_date);
+    const opDateMidnight = new Date(op.operation_date);
+    opDateMidnight.setHours(0, 0, 0, 0);
+
     const isThisMonth = opDate.getMonth() === currentMonth && opDate.getFullYear() === currentYear;
     const isOverdue = remaining > 0 && differenceInDays(now, opDate) > 15;
+
+    const chartItem = chartData.find(c => c.timestamp === opDateMidnight.getTime());
 
     if (op.operation_type === "income") {
       totalBalance += totalPaid;
       if (remaining > 0) totalReceivables += remaining;
       if (isOverdue) overdueReceivablesList.push(op);
       if (isThisMonth) thisMonthIncome += op.total_amount;
+      if (chartItem) chartItem.income += op.total_amount;
       
       if (op.initial_account_id && op.initial_paid_amount > 0) {
         if (accountBalances[op.initial_account_id] !== undefined) {
@@ -56,6 +76,7 @@ export async function getDashboardStats() {
       if (remaining > 0) totalDebts += remaining;
       if (isOverdue) overdueDebtsList.push(op);
       if (isThisMonth) thisMonthExpense += op.total_amount;
+      if (chartItem) chartItem.expense += op.total_amount;
 
       if (op.initial_account_id && op.initial_paid_amount > 0) {
         if (accountBalances[op.initial_account_id] !== undefined) {
@@ -81,6 +102,7 @@ export async function getDashboardStats() {
     overdueReceivablesList,
     overdueDebtsList,
     recentOperations: operations.slice(0, 5),
-    accountBalances
+    accountBalances,
+    chartData
   };
 }

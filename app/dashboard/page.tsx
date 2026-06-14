@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import BottomNav from './components/BottomNav'
 
 // Action serveur pour se déconnecter
 async function handleSignOut() {
@@ -128,10 +127,6 @@ export default async function DashboardPage() {
         }
     ]
 
-    let categories = []
-    let accounts = []
-    let parties = []
-
     try {
         // Tentative de récupération des soldes depuis la vue account_balances
         const { data: bData } = await supabase
@@ -170,7 +165,7 @@ export default async function DashboardPage() {
             }))
         }
 
-        // Calcul du résultat du mois
+        // Calcul du résultat du mois (income payé - expense payé de ce mois-ci)
         const startOfMonth = new Date()
         startOfMonth.setDate(1)
         const yyyymmdd = startOfMonth.toISOString().split('T')[0]
@@ -197,20 +192,8 @@ export default async function DashboardPage() {
                 .filter(o => o.operation_type === 'expense')
                 .reduce((acc, o) => acc + Number(o.remaining_amount), 0)
         }
-
-        // Récupération des données pour le formulaire de saisie
-        const [{ data: cats }, { data: accs }, { data: pts }] = await Promise.all([
-            supabase.from('categories').select('id, name, type'), // type: income/expense si ça existe, sinon on triera manuellement
-            supabase.from('accounts').select('id, name'),
-            supabase.from('parties').select('id, name')
-        ])
-
-        if (cats) categories = cats
-        if (accs) accounts = accs
-        if (pts) parties = pts
-
     } catch (e) {
-        console.warn("La base de données n'est pas encore totalement accessible. Utilisation des données de démonstration.", e)
+        console.warn("La base de données n'est pas encore initialisée ou accessible. Utilisation des données de démonstration.", e)
     }
 
     const totalBalance = waveBalance + cashBalance
@@ -218,95 +201,161 @@ export default async function DashboardPage() {
     const netCreditBalance = clientDebt - supplierDebt
 
     return (
-        <main className="min-h-[100dvh] bg-background text-slate-50 pb-24 font-sans">
+        <main className="min-h-screen bg-slate-950 text-white pb-24 font-sans">
             {/* Barre supérieure */}
-            <header className="sticky top-0 z-40 px-6 py-5 flex items-center justify-between bg-background/80 backdrop-blur-md border-b border-slate-800/30">
+            <header className="border-b border-slate-900 bg-slate-900/50 backdrop-blur-md sticky top-0 z-40 px-4 py-4 flex items-center justify-between">
                 <div>
-                    <h1 className="text-xl font-medium tracking-tight text-slate-50">Sencaille</h1>
-                    <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-slate-400">{profile.full_name}</span>
+                    <h1 className="text-xl font-bold text-emerald-500">SENCAILLE Finance</h1>
+                    <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-slate-400">Bienvenue, {profile.full_name}</span>
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span className="text-[10px] uppercase tracking-wider bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-mono">
+                            {profile.role === 'admin' ? 'Admin' : 'Agent'}
+                        </span>
                     </div>
                 </div>
+                <form action={handleSignOut}>
+                    <button
+                        type="submit"
+                        className="rounded-xl border border-slate-800 hover:border-red-900 bg-slate-900 hover:bg-red-950/20 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-red-400 transition-all"
+                    >
+                        Déconnexion
+                    </button>
+                </form>
             </header>
 
-            <div className="max-w-lg mx-auto px-6 py-8 space-y-12">
-                {/* Section Solde Principal */}
-                <section className="space-y-6">
-                    <div>
-                        <p className="text-sm font-medium text-slate-400 mb-1">Solde total disponible</p>
-                        <p className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-50 font-mono">
-                            {totalBalance.toLocaleString('fr-FR')} <span className="text-lg text-slate-500 font-sans font-normal">FCFA</span>
-                        </p>
+            <div className="max-w-md mx-auto px-4 py-6 space-y-6">
+                {/* Section Comptes (Trésorerie disponible) */}
+                <section className="space-y-3">
+                    <h2 className="text-sm font-semibold tracking-wider text-slate-400 uppercase">Trésorerie disponible</h2>
+                    
+                    {/* Carte principale Solde Total */}
+                    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-950/40 to-slate-900 border border-emerald-900/30 p-6 shadow-lg">
+                        <div className="absolute right-0 top-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl"></div>
+                        <p className="text-xs font-medium text-emerald-400/80">Solde total disponible</p>
+                        <p className="text-3xl font-extrabold mt-1 tracking-tight">{totalBalance.toLocaleString('fr-FR')} <span className="text-lg font-normal text-slate-400">FCFA</span></p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-8 pt-4 border-t border-slate-800/30">
-                        <div>
-                            <p className="text-xs font-medium text-slate-400 mb-1 flex items-center gap-2">
-                                WAVE <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                            </p>
-                            <p className="text-xl font-medium text-slate-200 font-mono">{waveBalance.toLocaleString('fr-FR')} <span className="text-xs text-slate-500 font-sans">FCFA</span></p>
+                    <div className="grid grid-cols-2 gap-3">
+                        {/* Solde WAVE */}
+                        <div className="rounded-xl bg-slate-900 border border-slate-850 p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-xs font-medium text-slate-400">WAVE SENCAILLE</span>
+                                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                            </div>
+                            <p className="text-lg font-bold tracking-tight">{waveBalance.toLocaleString('fr-FR')} <span className="text-xs font-normal text-slate-400">FCFA</span></p>
                         </div>
-                        <div>
-                            <p className="text-xs font-medium text-slate-400 mb-1 flex items-center gap-2">
-                                Caisse <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                            </p>
-                            <p className="text-xl font-medium text-slate-200 font-mono">{cashBalance.toLocaleString('fr-FR')} <span className="text-xs text-slate-500 font-sans">FCFA</span></p>
+
+                        {/* Solde Caisse */}
+                        <div className="rounded-xl bg-slate-900 border border-slate-850 p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-xs font-medium text-slate-400">Caisse Espèces</span>
+                                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                            </div>
+                            <p className="text-lg font-bold tracking-tight">{cashBalance.toLocaleString('fr-FR')} <span className="text-xs font-normal text-slate-400">FCFA</span></p>
                         </div>
                     </div>
                 </section>
 
-                {/* Section Résumé du mois */}
-                <section className="space-y-4">
-                    <h2 className="text-xs font-medium tracking-wider text-slate-500 uppercase">Ce mois-ci</h2>
-                    <div className="space-y-3">
-                        <div className="flex items-center justify-between py-2">
-                            <span className="text-sm text-slate-300">Entrées</span>
-                            <span className="text-sm font-medium text-emerald-400 font-mono">+{monthlyIncome.toLocaleString('fr-FR')}</span>
+                {/* Section Ce mois-ci (Activité de trésorerie) */}
+                <section className="space-y-3">
+                    <h2 className="text-sm font-semibold tracking-wider text-slate-400 uppercase">Activité de trésorerie (ce mois)</h2>
+                    <div className="rounded-2xl bg-slate-900 border border-slate-850 p-5 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">✓</div>
+                                <div>
+                                    <p className="text-xs font-medium text-slate-400">Recettes encaissées</p>
+                                    <p className="text-sm font-bold text-slate-200">{monthlyIncome.toLocaleString('fr-FR')} FCFA</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400">✗</div>
+                                <div>
+                                    <p className="text-xs font-medium text-slate-400">Dépenses payées</p>
+                                    <p className="text-sm font-bold text-slate-200">{monthlyExpense.toLocaleString('fr-FR')} FCFA</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex items-center justify-between py-2 border-t border-slate-800/30">
-                            <span className="text-sm text-slate-300">Sorties</span>
-                            <span className="text-sm font-medium text-rose-400 font-mono">-{monthlyExpense.toLocaleString('fr-FR')}</span>
+
+                        <div className="border-t border-slate-800 pt-3 flex items-center justify-between">
+                            <span className="text-xs font-medium text-slate-400">Résultat de trésorerie</span>
+                            <span className={`text-sm font-bold ${monthResult >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                                {monthResult >= 0 ? '+' : ''}{monthResult.toLocaleString('fr-FR')} FCFA
+                            </span>
                         </div>
-                        <div className="flex items-center justify-between py-2 border-t border-slate-800/30">
-                            <span className="text-sm text-slate-300">Résultat net</span>
-                            <span className={`text-sm font-medium font-mono ${monthResult >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                                {monthResult >= 0 ? '+' : ''}{monthResult.toLocaleString('fr-FR')}
+                    </div>
+                </section>
+
+                {/* Section Crédits & Dettes */}
+                <section className="space-y-3">
+                    <h2 className="text-sm font-semibold tracking-wider text-slate-400 uppercase">Crédits & Dettes (ce mois)</h2>
+                    <div className="rounded-2xl bg-slate-900 border border-slate-850 p-5 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">Clients débiteurs</p>
+                                <p className="text-base font-bold text-amber-400 mt-1">{clientDebt.toLocaleString('fr-FR')} FCFA</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">Fournisseurs à payer</p>
+                                <p className="text-base font-bold text-red-400 mt-1">{supplierDebt.toLocaleString('fr-FR')} FCFA</p>
+                            </div>
+                        </div>
+
+                        <div className="border-t border-slate-800 pt-3 flex items-center justify-between text-xs">
+                            <span className="font-medium text-slate-400">Balance nette des crédits</span>
+                            <span className={`font-bold ${netCreditBalance >= 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                {netCreditBalance >= 0 ? '+' : ''}{netCreditBalance.toLocaleString('fr-FR')} FCFA
                             </span>
                         </div>
                     </div>
                 </section>
 
                 {/* Section Dernières opérations */}
-                <section className="space-y-4">
+                <section className="space-y-3">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xs font-medium tracking-wider text-slate-500 uppercase">Dernières opérations</h2>
-                        <button className="p-3 -mr-3 text-xs font-medium text-emerald-500 hover:text-emerald-400 transition-colors">Voir tout</button>
+                        <h2 className="text-sm font-semibold tracking-wider text-slate-400 uppercase">Dernières opérations</h2>
+                        <span className="text-xs font-semibold text-emerald-500 hover:text-emerald-400 cursor-pointer">Voir tout</span>
                     </div>
 
-                    <div className="flex flex-col">
-                        {latestOperations.map((op, index) => {
+                    <div className="space-y-2.5">
+                        {latestOperations.map((op) => {
                             const isIncome = op.operation_type === 'income'
                             const dateFormatee = new Date(op.operation_date).toLocaleDateString('fr-FR', {
                                 day: 'numeric',
                                 month: 'short'
                             })
 
+                            // Couleurs des statuts
+                            let statusBadge = null
+                            if (op.computed_payment_status === 'paid') {
+                                statusBadge = <span className="text-[10px] font-medium bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full">Payé</span>
+                            } else if (op.computed_payment_status === 'partial') {
+                                statusBadge = <span className="text-[10px] font-medium bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded-full">Partiel</span>
+                            } else {
+                                statusBadge = <span className="text-[10px] font-medium bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full">À crédit</span>
+                            }
+
                             return (
-                                <div key={op.id} className={`py-4 flex items-start justify-between ${index !== 0 ? 'border-t border-slate-800/30' : ''}`}>
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-sm font-medium text-slate-200">{op.category_name}</p>
-                                        <p className="text-xs text-slate-500">{dateFormatee} • {op.party_name || op.author_name}</p>
-                                        {op.computed_payment_status !== 'paid' && (
-                                            <p className={`text-[10px] font-medium mt-0.5 ${op.computed_payment_status === 'partial' ? 'text-amber-400' : 'text-rose-400'}`}>
-                                                {op.computed_payment_status === 'partial' ? 'Paiement partiel' : 'À crédit'}
-                                            </p>
-                                        )}
+                                <div key={op.id} className="rounded-xl bg-slate-900 border border-slate-850 p-4 flex items-center justify-between hover:bg-slate-850/50 transition-colors">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm ${isIncome ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                                            {isIncome ? '+' : '-'}
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-semibold text-slate-200">{op.category_name}</p>
+                                            <div className="flex items-center gap-2 mt-1 text-[10px] text-slate-400">
+                                                <span>{dateFormatee}</span>
+                                                <span>•</span>
+                                                <span>{op.party_name || op.author_name}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className={`text-sm font-medium font-mono ${isIncome ? 'text-emerald-400' : 'text-slate-200'}`}>
-                                            {isIncome ? '+' : '-'}{op.total_amount.toLocaleString('fr-FR')}
+                                    <div className="text-right space-y-1">
+                                        <p className={`text-xs font-bold ${isIncome ? 'text-emerald-400' : 'text-red-400'}`}>
+                                            {isIncome ? '+' : '-'}{op.total_amount.toLocaleString('fr-FR')} FCFA
                                         </p>
+                                        <div>{statusBadge}</div>
                                     </div>
                                 </div>
                             )
@@ -315,8 +364,29 @@ export default async function DashboardPage() {
                 </section>
             </div>
 
-            {/* Navigation basse interactive avec Tiroir de Saisie */}
-            <BottomNav categories={categories} accounts={accounts} parties={parties} />
+            {/* Barre de navigation basse (Mobile Navigation) */}
+            <nav className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/90 backdrop-blur-lg border-t border-slate-850 px-6 py-2 flex justify-between items-center max-w-md mx-auto rounded-t-2xl shadow-xl">
+                <button className="flex flex-col items-center gap-1 text-emerald-400">
+                    <span className="text-lg">🏠</span>
+                    <span className="text-[10px] font-medium">Accueil</span>
+                </button>
+                <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200">
+                    <span className="text-lg">➕</span>
+                    <span className="text-[10px] font-medium">Saisir</span>
+                </button>
+                <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200">
+                    <span className="text-lg">📜</span>
+                    <span className="text-[10px] font-medium">Historique</span>
+                </button>
+                <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200">
+                    <span className="text-lg">💳</span>
+                    <span className="text-[10px] font-medium">Crédits</span>
+                </button>
+                <button className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-200">
+                    <span className="text-lg">📊</span>
+                    <span className="text-[10px] font-medium">Rapports</span>
+                </button>
+            </nav>
         </main>
     )
 }

@@ -128,6 +128,10 @@ export default async function DashboardPage() {
         }
     ]
 
+    let categories = []
+    let accounts = []
+    let parties = []
+
     try {
         // Tentative de récupération des soldes depuis la vue account_balances
         const { data: bData } = await supabase
@@ -166,7 +170,7 @@ export default async function DashboardPage() {
             }))
         }
 
-        // Calcul du résultat du mois (income payé - expense payé de ce mois-ci)
+        // Calcul du résultat du mois
         const startOfMonth = new Date()
         startOfMonth.setDate(1)
         const yyyymmdd = startOfMonth.toISOString().split('T')[0]
@@ -193,8 +197,20 @@ export default async function DashboardPage() {
                 .filter(o => o.operation_type === 'expense')
                 .reduce((acc, o) => acc + Number(o.remaining_amount), 0)
         }
+
+        // Récupération des données pour le formulaire de saisie
+        const [{ data: cats }, { data: accs }, { data: pts }] = await Promise.all([
+            supabase.from('categories').select('id, name, type'), // type: income/expense si ça existe, sinon on triera manuellement
+            supabase.from('accounts').select('id, name'),
+            supabase.from('parties').select('id, name')
+        ])
+
+        if (cats) categories = cats
+        if (accs) accounts = accs
+        if (pts) parties = pts
+
     } catch (e) {
-        console.warn("La base de données n'est pas encore initialisée ou accessible. Utilisation des données de démonstration.", e)
+        console.warn("La base de données n'est pas encore totalement accessible. Utilisation des données de démonstration.", e)
     }
 
     const totalBalance = waveBalance + cashBalance
@@ -300,7 +316,7 @@ export default async function DashboardPage() {
             </div>
 
             {/* Navigation basse interactive avec Tiroir de Saisie */}
-            <BottomNav />
+            <BottomNav categories={categories} accounts={accounts} parties={parties} />
         </main>
     )
 }

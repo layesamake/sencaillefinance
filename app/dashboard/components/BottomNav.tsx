@@ -4,7 +4,13 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import TransactionDrawer from './TransactionDrawer'
 
-export default function BottomNav() {
+interface BottomNavProps {
+    categories?: any[]
+    accounts?: any[]
+    parties?: any[]
+}
+
+export default function BottomNav({ categories = [], accounts = [], parties = [] }: BottomNavProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
     const supabase = createClient()
 
@@ -56,6 +62,9 @@ export default function BottomNav() {
             <TransactionDrawer 
                 isOpen={isDrawerOpen} 
                 onClose={() => setIsDrawerOpen(false)} 
+                categories={categories}
+                accounts={accounts}
+                parties={parties}
             />
         </>
     )

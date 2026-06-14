@@ -1,42 +1,71 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { addOperation } from '../actions'
 
 interface TransactionDrawerProps {
     isOpen: boolean
     onClose: () => void
+    categories?: any[]
+    accounts?: any[]
+    parties?: any[]
 }
 
-const CATEGORIES_INCOME = ['Vente œufs', 'Vente cailleteaux', 'Vente viande', 'Autre entrée']
-const CATEGORIES_EXPENSE = ['Aliment', 'Transport', 'Matériel', 'Frais vétérinaires', 'Autre sortie']
-
-export default function TransactionDrawer({ isOpen, onClose }: TransactionDrawerProps) {
+export default function TransactionDrawer({ isOpen, onClose, categories = [], accounts = [], parties = [] }: TransactionDrawerProps) {
     const [type, setType] = useState<'income' | 'expense'>('income')
     const [amount, setAmount] = useState('')
-    const [category, setCategory] = useState(CATEGORIES_INCOME[0])
-    const [description, setDescription] = useState('')
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    
+    // On sépare les catégories selon le type (si la colonne `type` existe, sinon on prend tout)
+    const incomeCategories = categories.filter(c => c.type === 'income' || !c.type)
+    const expenseCategories = categories.filter(c => c.type === 'expense' || !c.type)
 
-    // Gère le basculement entre entrée et sortie
-    const handleTypeChange = (newType: 'income' | 'expense') => {
-        setType(newType)
-        setCategory(newType === 'income' ? CATEGORIES_INCOME[0] : CATEGORIES_EXPENSE[0])
-    }
+    const currentCategories = type === 'income' ? incomeCategories : expenseCategories
+
+    const [category, setCategory] = useState(currentCategories[0]?.id || '')
+    const [account, setAccount] = useState(accounts[0]?.id || '')
+    const [party, setParty] = useState('') // Optionnel
+    const [description, setDescription] = useState('')
+    
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [errorMsg, setErrorMsg] = useState('')
+
+    // Reset les sélections si le type change ou si les props changent
+    useEffect(() => {
+        setCategory(currentCategories[0]?.id || '')
+    }, [type, categories]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        if (accounts.length > 0 && !account) {
+            setAccount(accounts[0].id)
+        }
+    }, [accounts]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        setErrorMsg('')
         setIsSubmitting(true)
         
-        // Simulation d'une sauvegarde
-        await new Promise(resolve => setTimeout(resolve, 800))
-        
-        console.log({ type, amount, category, description })
-        
-        // Réinitialisation
-        setAmount('')
-        setDescription('')
+        const formData = new FormData()
+        formData.append('operation_type', type)
+        formData.append('total_amount', amount)
+        formData.append('category_id', category)
+        formData.append('initial_account_id', account)
+        if (party) formData.append('party_id', party)
+        if (description) formData.append('description', description)
+
+        const result = await addOperation(formData)
+
         setIsSubmitting(false)
-        onClose()
+
+        if (!result.success) {
+            setErrorMsg(result.error || "Erreur inconnue")
+        } else {
+            // Succès ! On réinitialise et on ferme
+            setAmount('')
+            setDescription('')
+            setParty('')
+            onClose()
+        }
     }
 
     // Styles conditionnels pour l'animation
@@ -78,13 +107,19 @@ export default function TransactionDrawer({ isOpen, onClose }: TransactionDrawer
                     </button>
                 </div>
 
+                {errorMsg && (
+                    <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm">
+                        {errorMsg}
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                     
                     {/* Sélecteur Entrée / Sortie */}
                     <div className="flex p-1 bg-slate-950 rounded-xl">
                         <button
                             type="button"
-                            onClick={() => handleTypeChange('income')}
+                            onClick={() => setType('income')}
                             className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
                                 type === 'income' ? 'bg-emerald-500/20 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'
                             }`}
@@ -93,7 +128,7 @@ export default function TransactionDrawer({ isOpen, onClose }: TransactionDrawer
                         </button>
                         <button
                             type="button"
-                            onClick={() => handleTypeChange('expense')}
+                            onClick={() => setType('expense')}
                             className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
                                 type === 'expense' ? 'bg-rose-500/20 text-rose-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'
                             }`}
@@ -119,14 +154,49 @@ export default function TransactionDrawer({ isOpen, onClose }: TransactionDrawer
                     <div>
                         <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Catégorie</label>
                         <select
+                            required
                             className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-slate-200 outline-none focus:border-slate-600 appearance-none"
                             value={category}
                             onChange={e => setCategory(e.target.value)}
                         >
-                            {(type === 'income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE).map(cat => (
-                                <option key={cat} value={cat}>{cat}</option>
+                            <option value="" disabled>Sélectionner une catégorie</option>
+                            {currentCategories.map(cat => (
+                                <option key={cat.id} value={cat.id}>{cat.name}</option>
                             ))}
                         </select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Compte */}
+                        <div>
+                            <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Compte</label>
+                            <select
+                                required
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-slate-200 outline-none focus:border-slate-600 appearance-none"
+                                value={account}
+                                onChange={e => setAccount(e.target.value)}
+                            >
+                                <option value="" disabled>Compte</option>
+                                {accounts.map(acc => (
+                                    <option key={acc.id} value={acc.id}>{acc.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Tiers (Client/Fournisseur) */}
+                        <div>
+                            <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Tiers (Optionnel)</label>
+                            <select
+                                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3.5 text-sm text-slate-200 outline-none focus:border-slate-600 appearance-none"
+                                value={party}
+                                onChange={e => setParty(e.target.value)}
+                            >
+                                <option value="">Aucun tiers</option>
+                                {parties.map(p => (
+                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     {/* Description optionnelle */}
@@ -143,7 +213,7 @@ export default function TransactionDrawer({ isOpen, onClose }: TransactionDrawer
 
                     <button
                         type="submit"
-                        disabled={isSubmitting || !amount}
+                        disabled={isSubmitting || !amount || !category || !account}
                         className={`w-full py-4 rounded-xl font-medium transition-transform active:scale-95 disabled:opacity-50 disabled:active:scale-100 ${
                             type === 'income' ? 'bg-emerald-500 text-slate-950' : 'bg-rose-500 text-white'
                         }`}

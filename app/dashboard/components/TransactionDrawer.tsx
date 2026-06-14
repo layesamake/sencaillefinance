@@ -64,7 +64,19 @@ export default function TransactionDrawer({ isOpen, onClose }: TransactionDrawer
                 {/* Poignée de glissement visuelle */}
                 <div className="w-12 h-1.5 bg-slate-800 rounded-full mx-auto mb-6" />
 
-                <h2 className="text-xl font-medium text-slate-50 mb-6 font-sans">Nouvelle saisie</h2>
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-medium text-slate-50 font-sans">Nouvelle saisie</h2>
+                    <button 
+                        onClick={onClose}
+                        type="button"
+                        className="p-2 -mr-2 text-slate-400 hover:text-slate-200 transition-colors rounded-full hover:bg-slate-800 active:scale-95"
+                        aria-label="Fermer"
+                    >
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     

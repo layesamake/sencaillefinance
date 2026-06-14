@@ -56,11 +56,11 @@ export default function BottomNav({ categories = [], accounts = [], parties = []
                     </button>
                 </div>
 
-                <button className={`p-3 flex items-center justify-center transition-colors active:scale-95 text-slate-400 hover:text-slate-200`} aria-label="Rapports">
+                <Link href="/reports" className={`p-3 flex items-center justify-center transition-colors active:scale-95 ${getIconColor('/reports')}`} aria-label="Rapports">
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                </button>
+                </Link>
                 
                 <button onClick={handleSignOutClick} className="p-3 text-slate-400 hover:text-rose-400 flex items-center justify-center transition-colors active:scale-95" aria-label="Déconnexion">
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
